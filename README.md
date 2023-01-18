@@ -13,6 +13,12 @@ version 0.2
 
 - cart: goods issue and orders
 
+version 0.3
+
+- goods orders list
+- supply orders list
+- async products list state
+
 to be continued..
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
