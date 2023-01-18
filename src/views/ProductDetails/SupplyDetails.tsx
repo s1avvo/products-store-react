@@ -1,6 +1,6 @@
 import { Box, Tab, Tabs } from "@mui/material";
 import React, { useState } from "react";
-import { GoodsEntity, SupplyEntity, SupplyItem } from "types";
+import { GoodsEntity, SupplyEntity } from "types";
 import { TabPanel } from "./TabPanel";
 import {
   DataGrid,
@@ -53,6 +53,7 @@ export const SupplyDetails = (props: Props) => {
           <DataGrid
             rows={props.goods}
             columns={columns}
+            getRowId={(row) => row.productId}
             components={{
               Toolbar: () => (
                 <GridToolbarContainer sx={{ justifyContent: "space-between" }}>

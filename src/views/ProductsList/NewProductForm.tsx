@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { CreateProductReq } from "types";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
 import {
   Box,
   Button,
@@ -7,10 +12,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import * as Yup from "yup";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { CreateProductReq } from "types";
 
 const modalStyles = {
   wrapper: {

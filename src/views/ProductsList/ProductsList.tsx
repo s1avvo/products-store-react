@@ -1,62 +1,66 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
+
 import { CreateProductReq, ProductEntity, CartSupply } from "types";
+
 import { Box, Button, Typography } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCart,
-  addToProductsList,
-  removeToProductsList,
-  setCartProduct,
-  setProductsList,
-} from "../../state/state";
 import {
   DataGrid,
   GridActionsCellItem,
-  GridCellParams,
   GridColDef,
-  GridColumnVisibilityModel,
   GridRenderEditCellParams,
   GridRowId,
-  GridRowParams,
   GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
-
 import {
   AddCircleOutlineOutlined,
   DeleteOutlined,
-  InfoOutlined,
   ArrowCircleRightOutlined,
 } from "@mui/icons-material";
+
+import { addToCart, setCartProduct } from "../../state/cartSlice";
+import {
+  addToProductsList,
+  fetchProductsList,
+  removeToProductsList,
+  setStatus,
+} from "../../state/productListSlice";
+
 import { NewProductForm } from "./NewProductForm";
-import { useNavigate } from "react-router-dom";
 import { ProductSupplyForm } from "./ProductSupplyForm";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { ProductsGoodsListMenu } from "./ProductsGoodsListMenu";
 
 export const ProductsList = () => {
   const navigate = useNavigate();
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
+  const [filter, setFilter] = useState("products");
   // const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
   const dispatch = useAppDispatch();
-  const products = useAppSelector((state) => state.cart.productsList);
+  const products = useAppSelector((state) => state.productList.productsList);
   const cart = useAppSelector((state) => state.cart.cart);
+  const postStatus = useAppSelector((state) => state.productList.status);
+  const [openAmount, setOpenAmount] = useState(false);
+
   // const breakPoint = useMediaQuery("(min-width:600px)");
   // const [columnVisibilityModel, setColumnVisibilityModel] =
   //   useState<GridColumnVisibilityModel>({
   //     id: false,
   //   });
-  const [openAmount, setOpenAmount] = useState(false);
 
-  async function getItems() {
-    const res = await fetch("http://localhost:3001/all", { method: "GET" });
-    dispatch(setProductsList(await res.json()));
-  }
+  /*FILTER*/
+
+  const handleFilter = (filter: string) => {
+    setFilter(filter);
+  };
 
   useEffect(() => {
-    getItems();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (postStatus === "idle") {
+      dispatch(fetchProductsList(filter!));
+    }
+  }, [dispatch, postStatus, filter]);
 
   /*ADD ACTION*/
 
@@ -92,6 +96,7 @@ export const ProductsList = () => {
         body: JSON.stringify({ id }),
       });
       dispatch(removeToProductsList({ id }));
+      dispatch(setStatus());
     } catch (e) {
       console.log(e);
     }
@@ -119,7 +124,7 @@ export const ProductsList = () => {
             key={`${cellValues.id}-details`}
             icon={<ArrowCircleRightOutlined />}
             label="Details"
-            onClick={() => navigate(`/${cellValues.row.id}`)}
+            onClick={() => navigate(`/details/${cellValues.row.id}`)}
             color="inherit"
           />,
         ];
@@ -205,20 +210,19 @@ export const ProductsList = () => {
           justifyContent="center"
           alignItems="center"
           position="relative"
-          mb="15px"
+          m="15px"
         >
           <Box position="absolute">
             <Typography variant="h4">
               Lista <b>Produktów</b>
             </Typography>
           </Box>
-          <Button
-            variant="contained"
-            onClick={() => setOpenProduct(true)}
-            sx={{ marginLeft: "auto" }}
-          >
-            Dodaj
-          </Button>
+          <Box marginLeft="auto">
+            <ProductsGoodsListMenu handleFilter={handleFilter} />
+            <Button variant="contained" onClick={() => setOpenProduct(true)}>
+              Dodaj produkt
+            </Button>
+          </Box>
         </Box>
         <Box margin="0 auto" height="75vh">
           <DataGrid
@@ -232,7 +236,7 @@ export const ProductsList = () => {
                 </GridToolbarContainer>
               ),
             }}
-            loading={!products.length}
+            loading={postStatus === "loading"}
             sx={{ padding: "10px" }}
             // checkboxSelection
             // onSelectionModelChange={(newSelectionModel) => {
@@ -252,9 +256,9 @@ export const ProductsList = () => {
             // onColumnVisibilityModelChange={(newModel) =>
             //   setColumnVisibilityModel(newModel)
             // }
-            initialState={{
-              sorting: { sortModel: [{ field: "name", sort: "asc" }] },
-            }}
+            // initialState={{
+            //   sorting: { sortModel: [{ field: "name", sort: "asc" }] },
+            // }}
           />
         </Box>
       </Box>

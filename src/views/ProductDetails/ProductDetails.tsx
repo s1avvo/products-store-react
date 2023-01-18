@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import { ProductEntity, GoodsEntity, SupplyEntity } from "types";
 import { Box, Typography } from "@mui/material";
-import { useParams } from "react-router-dom";
 import { SupplyDetails } from "./SupplyDetails";
 
 export const ProductDetails = () => {
@@ -11,7 +12,7 @@ export const ProductDetails = () => {
   const [supply, setSupply] = useState<SupplyEntity[]>([]);
 
   async function getItem() {
-    const res = await fetch(`http://localhost:3001/${productId}`, {
+    const res = await fetch(`http://localhost:3001/details/${productId}`, {
       method: "GET",
     });
     const item = await res.json();
@@ -22,7 +23,7 @@ export const ProductDetails = () => {
 
   useEffect(() => {
     getItem();
-  }, [productId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [productId]);
 
   return (
     <Box width="80%" m="80px auto">

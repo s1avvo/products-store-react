@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
+import { CartSupply } from "types";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
   Button,
   Divider,
-  Drawer,
   FormControl,
   InputLabel,
   MenuItem,
@@ -13,13 +17,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import * as Yup from "yup";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { CartSupply } from "types";
-import { useDispatch, useSelector } from "react-redux";
-import { setIsGoodsOrSupply } from "../../state/state";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+
+import { setIsGoodsOrSupply } from "../../state/cartSlice";
 
 const modalStyles = {
   wrapper: {
@@ -57,11 +56,11 @@ const PERSONS = {
   7: "Joanna Warguła",
 };
 
-const STATUS = {
-  0: "Oczekujące",
-  1: "Zrealizowane",
-  2: "Anulowane",
-};
+// const STATUS = {
+//   0: "Oczekujące",
+//   1: "Zrealizowane",
+//   2: "Anulowane",
+// };
 
 interface Props {
   open: boolean;

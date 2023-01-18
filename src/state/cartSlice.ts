@@ -1,9 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../index";
-import { CartSupply, ProductEntity, QtyUpdate } from "types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { CartSupply, ProductEntity } from "types";
 
-interface Global {
+interface CartState {
   isCartOpen: boolean;
   isGoodsOrSupply: "goods" | "supply";
   cart: CartSupply[];
@@ -11,7 +9,7 @@ interface Global {
   productsList: ProductEntity[];
 }
 
-const initialState: Global = {
+const initialState: CartState = {
   isCartOpen: false,
   isGoodsOrSupply: "goods",
   cart: [],
@@ -23,28 +21,6 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    setProductsList: (state, action: PayloadAction<ProductEntity[]>) => {
-      state.productsList = action.payload;
-    },
-
-    updateQty: (state, action: PayloadAction<QtyUpdate>) => {
-      state.productsList = [...state.productsList].map((item) =>
-        item.id === action.payload.id
-          ? { ...item, qty: item.qty + action.payload.qty }
-          : item
-      );
-    },
-
-    addToProductsList: (state, action: PayloadAction<ProductEntity>) => {
-      state.productsList = [...state.productsList, action.payload];
-    },
-
-    removeToProductsList: (state, action) => {
-      state.productsList = state.productsList.filter(
-        (item) => item.id !== action.payload.id
-      );
-    },
-
     setCartProduct: (state, action: PayloadAction<ProductEntity>) => {
       state.cartProduct = action.payload;
     },
@@ -77,10 +53,6 @@ export const {
   setIsGoodsOrSupply,
   clearCart,
   setCartProduct,
-  setProductsList,
-  addToProductsList,
-  removeToProductsList,
-  updateQty,
 } = cartSlice.actions;
 
-export default cartSlice.reducer;
+export const cartReducer = cartSlice.reducer;

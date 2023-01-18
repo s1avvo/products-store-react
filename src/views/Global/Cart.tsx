@@ -1,8 +1,10 @@
+import React, { FormEvent } from "react";
+import { CartSupply } from "types";
+import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
+
 import {
-  Badge,
   Box,
   Button,
-  Checkbox,
   Divider,
   FormControl,
   IconButton,
@@ -12,26 +14,17 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { useSelector, useDispatch, TypedUseSelectorHook } from "react-redux";
 import CloseIcon from "@mui/icons-material/Close";
 import styled from "@emotion/styled";
+
 import {
   clearCart,
   removeFromCart,
   setIsCartOpen,
   setIsGoodsOrSupply,
-  updateQty,
-} from "../../state/state";
-import { useNavigate } from "react-router-dom";
-import React, { FormEvent, useState } from "react";
-import {
-  CreateProductGoodsReq,
-  CreateSupplyReq,
-  CartSupply,
-  SupplyItem,
-} from "types";
+} from "../../state/cartSlice";
 
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { setStatus, updateQty } from "../../state/productListSlice";
 
 const FlexBox = styled(Box)`
   display: flex;
@@ -65,7 +58,6 @@ export const Cart = () => {
       const id = await supplyId.json();
 
       await handelSupplyItems(id.supplyId);
-
       dispatch(clearCart());
     } catch (e) {
       console.log(e);
@@ -87,7 +79,7 @@ export const Cart = () => {
           }),
         });
         dispatch(updateQty({ id: item.productId, qty: item.amount }));
-        dispatch(clearCart());
+        dispatch(setStatus());
       } catch (e) {
         console.log(e);
       }
@@ -111,6 +103,7 @@ export const Cart = () => {
           }),
         });
         dispatch(updateQty({ id: item.productId, qty: -item.amount }));
+        dispatch(setStatus());
         dispatch(clearCart());
       } catch (e) {
         console.log(e);

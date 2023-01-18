@@ -1,18 +1,32 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Badge, Box, IconButton, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
+import { useNavigate } from "react-router-dom";
+
+import {
+  Badge,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+
 import {
   PersonOutline,
   ShoppingBagOutlined,
   MenuOutlined,
   HomeOutlined,
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { setIsCartOpen } from "../../state/state";
+
+import { setIsCartOpen } from "../../state/cartSlice";
 
 export const Navbar = () => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const cart = useSelector((state: any) => state.cart.cart);
+  const dispatch = useAppDispatch();
+  const cart = useAppSelector((state) => state.cart.cart);
 
   return (
     <Box
@@ -59,16 +73,61 @@ export const Navbar = () => {
             color="secondary"
             invisible={cart.length === 0}
           >
-            <IconButton
-              onClick={() => dispatch(setIsCartOpen())}
-              sx={{ color: "black" }}
-            >
-              <ShoppingBagOutlined />
-            </IconButton>
+            <Tooltip title="Koszyk">
+              <IconButton
+                onClick={() => dispatch(setIsCartOpen())}
+                sx={{ color: "black" }}
+              >
+                <ShoppingBagOutlined />
+              </IconButton>
+            </Tooltip>
           </Badge>
-          <IconButton sx={{ color: "black" }}>
-            <MenuOutlined />
-          </IconButton>
+          <Tooltip title="Menu">
+            <IconButton
+              sx={{ color: "black" }}
+              onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                setAnchorEl(event.currentTarget);
+              }}
+              aria-controls={open ? "menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+            >
+              <MenuOutlined />
+            </IconButton>
+          </Tooltip>
+          <Menu
+            id="menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={() => setAnchorEl(null)}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            <MenuItem
+              onClick={() => {
+                navigate(`/`);
+                setAnchorEl(null);
+              }}
+            >
+              Lista produktów
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                navigate(`/goods`);
+                setAnchorEl(null);
+              }}
+            >
+              Wydania
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                navigate(`/supply`);
+                setAnchorEl(null);
+              }}
+            >
+              Zamówienia
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
     </Box>
