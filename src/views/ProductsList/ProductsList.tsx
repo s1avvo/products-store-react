@@ -116,8 +116,8 @@ export const ProductsList = () => {
         },
         body: JSON.stringify(product),
       });
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -226,6 +226,7 @@ export const ProductsList = () => {
             disabled={!toSave.find((id) => id === cellValues.id)}
             onClick={() => {
               updateProduct(cellValues.row);
+              setToSave([...toSave].filter((id) => id !== cellValues.id));
             }}
             color="inherit"
           />,
