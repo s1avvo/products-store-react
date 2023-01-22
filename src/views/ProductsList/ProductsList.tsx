@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
-
 import { CreateProductReq, ProductEntity, CartSupply } from "types";
 
-import { Box, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Paper,
+  SelectChangeEvent,
+  Typography,
+} from "@mui/material";
 import {
   DataGrid,
   GridActionsCellItem,
+  GridCellEditStopParams,
+  GridCellEditStopReasons,
+  GridCellModesModel,
   GridColDef,
   GridRenderEditCellParams,
   GridRowId,
+  GridRowModel,
   GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarQuickFilter,
+  MuiEvent,
+  useGridApiRef,
 } from "@mui/x-data-grid";
 import {
   AddCircleOutlineOutlined,
-  DeleteOutlined,
   ArrowCircleRightOutlined,
+  DeleteOutlined,
+  SaveOutlined,
 } from "@mui/icons-material";
 
 import { addToCart, setCartProduct } from "../../state/cartSlice";
@@ -26,6 +38,7 @@ import {
   addToProductsList,
   fetchProductsList,
   removeToProductsList,
+  selectAllProducts,
   setStatus,
 } from "../../state/productListSlice";
 
@@ -37,18 +50,14 @@ export const ProductsList = () => {
   const navigate = useNavigate();
   const [pageSize, setPageSize] = useState(10);
   const [filter, setFilter] = useState("products");
-  // const [selectionModel, setSelectionModel] = useState<GridSelectionModel>([]);
+  const [toSave, setToSave] = useState<GridRowId[]>([]);
   const dispatch = useAppDispatch();
-  const products = useAppSelector((state) => state.productList.productsList);
-  const cart = useAppSelector((state) => state.cart.cart);
+  const products = useAppSelector(selectAllProducts);
   const postStatus = useAppSelector((state) => state.productList.status);
+  const cart = useAppSelector((state) => state.cart.cart);
   const [openAmount, setOpenAmount] = useState(false);
 
-  // const breakPoint = useMediaQuery("(min-width:600px)");
-  // const [columnVisibilityModel, setColumnVisibilityModel] =
-  //   useState<GridColumnVisibilityModel>({
-  //     id: false,
-  //   });
+  // const apiRef = useGridApiRef();
 
   /*FILTER*/
 
@@ -68,6 +77,7 @@ export const ProductsList = () => {
 
   const addProduct = async (product: CreateProductReq) => {
     try {
+      dispatch(setStatus("pending"));
       const res = await fetch("http://localhost:3001/store/add", {
         method: "POST",
         headers: {
@@ -78,16 +88,44 @@ export const ProductsList = () => {
 
       const newProduct: ProductEntity = await res.json();
       dispatch(addToProductsList(newProduct));
+    } catch (err) {
+      console.error("Failed to save the new product: ", err);
+    } finally {
+      dispatch(setStatus("idle"));
+    }
+    setOpenProduct(false);
+  };
+
+  /*UPDATE ACTION*/
+
+  // const handleProcessRowUpdate = (newRow: GridRowModel) => {
+  //   console.log(newRow);
+  //   return newRow;
+  // };
+
+  const handleSave = (id: GridRowId) => {
+    setToSave((prevState) => [...prevState, id]);
+  };
+
+  const updateProduct = async (product: CreateProductReq) => {
+    try {
+      const res = await fetch("http://localhost:3001/store/update", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+      });
     } catch (e) {
       console.log(e);
     }
-    setOpenProduct(false);
   };
 
   /*DELETE ACTION*/
 
   const handleDeleteClick = async (id: GridRowId) => {
     try {
+      dispatch(setStatus("pending"));
       await fetch("http://localhost:3001/store/delete", {
         method: "DELETE",
         headers: {
@@ -96,9 +134,10 @@ export const ProductsList = () => {
         body: JSON.stringify({ id }),
       });
       dispatch(removeToProductsList({ id }));
-      dispatch(setStatus());
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.error("Failed to delete the product: ", err);
+    } finally {
+      dispatch(setStatus("idle"));
     }
   };
 
@@ -181,6 +220,16 @@ export const ProductsList = () => {
             color="inherit"
           />,
           <GridActionsCellItem
+            key={`${cellValues.id}-edit`}
+            icon={<SaveOutlined />}
+            label="Edit"
+            disabled={!toSave.find((id) => id === cellValues.id)}
+            onClick={() => {
+              updateProduct(cellValues.row);
+            }}
+            color="inherit"
+          />,
+          <GridActionsCellItem
             key={`${cellValues.id}-delete`}
             icon={<DeleteOutlined />}
             label="Delete"
@@ -224,7 +273,16 @@ export const ProductsList = () => {
             </Button>
           </Box>
         </Box>
-        <Box margin="0 auto" height="75vh">
+        <Paper
+          sx={{
+            margin: "0 auto",
+            // height: 'calc(100vh - 280px)',
+            height: "auto",
+            overflow: "auto",
+            backgroundColor: "rgba(250, 250, 250, 0.95)",
+            zIndex: "10",
+          }}
+        >
           <DataGrid
             rows={products}
             columns={columns}
@@ -237,30 +295,19 @@ export const ProductsList = () => {
               ),
             }}
             loading={postStatus === "loading"}
+            autoHeight={true}
             sx={{ padding: "10px" }}
-            // checkboxSelection
-            // onSelectionModelChange={(newSelectionModel) => {
-            //   setSelectionModel(newSelectionModel);
-            // }}
-            // selectionModel={selectionModel}
             disableSelectionOnClick
-            // autoPageSize={true}
             pagination
             pageSize={pageSize}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
             rowsPerPageOptions={[2, 5, 10]}
-            // experimentalFeatures={{ newEditingApi: true }}
-            // processRowUpdate={processRowUpdate}
-            // onProcessRowUpdateError={handleProcessRowUpdateError}
-            // columnVisibilityModel={columnVisibilityModel}
-            // onColumnVisibilityModelChange={(newModel) =>
-            //   setColumnVisibilityModel(newModel)
-            // }
-            // initialState={{
-            //   sorting: { sortModel: [{ field: "name", sort: "asc" }] },
-            // }}
+            editMode="cell"
+            onCellEditStop={(params, event) => handleSave(params.id)}
+            // processRowUpdate={handleProcessRowUpdate}
+            experimentalFeatures={{ newEditingApi: true }}
           />
-        </Box>
+        </Paper>
       </Box>
     </>
   );

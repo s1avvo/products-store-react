@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ProductEntity, QtyUpdate } from "types";
+import { RootState } from "../app/store";
 
 interface ProductsListState {
   productsList: ProductEntity[];
@@ -38,8 +39,8 @@ export const productListSlice = createSlice({
     removeToProductsList: (state, action) => {
       state.productsList.filter((item) => item.id !== action.payload.id);
     },
-    setStatus: (state) => {
-      state.status = "idle";
+    setStatus: (state, action) => {
+      state.status = action.payload;
     },
   },
   extraReducers(builder) {
@@ -61,3 +62,9 @@ export const { updateQty, addToProductsList, removeToProductsList, setStatus } =
   productListSlice.actions;
 
 export const productListReducer = productListSlice.reducer;
+
+export const selectAllProducts = (state: RootState) =>
+  state.productList.productsList;
+
+export const selectProductById = (state: RootState, productId: string) =>
+  state.productList.productsList.find((product) => product.id === productId);

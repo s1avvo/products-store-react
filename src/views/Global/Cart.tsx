@@ -67,6 +67,7 @@ export const Cart = () => {
   const handelSupplyItems = (supplyId: string) => {
     cart.map(async (item: CartSupply) => {
       try {
+        dispatch(setStatus("pending"));
         await fetch(`http://localhost:3001/store/supply/item`, {
           method: "POST",
           headers: {
@@ -79,9 +80,10 @@ export const Cart = () => {
           }),
         });
         dispatch(updateQty({ id: item.productId, qty: item.amount }));
-        dispatch(setStatus());
-      } catch (e) {
-        console.log(e);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        dispatch(setStatus("idle"));
       }
     });
   };
@@ -91,6 +93,7 @@ export const Cart = () => {
 
     cart.map(async (item: CartSupply) => {
       try {
+        dispatch(setStatus("pending"));
         await fetch(`http://localhost:3001/store/goods/${item.productId}`, {
           method: "POST",
           headers: {
@@ -103,10 +106,11 @@ export const Cart = () => {
           }),
         });
         dispatch(updateQty({ id: item.productId, qty: -item.amount }));
-        dispatch(setStatus());
         dispatch(clearCart());
-      } catch (e) {
-        console.log(e);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        dispatch(setStatus("idle"));
       }
     });
   };

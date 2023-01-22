@@ -43,7 +43,7 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
         <MenuItem
           onClick={() => {
             handleFilter("products-goods");
-            dispatch(setStatus());
+            dispatch(setStatus("idle"));
             setAnchorEl(null);
           }}
         >
@@ -52,7 +52,7 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
         <MenuItem
           onClick={() => {
             handleFilter("products-supply");
-            dispatch(setStatus());
+            dispatch(setStatus("idle"));
             setAnchorEl(null);
           }}
         >

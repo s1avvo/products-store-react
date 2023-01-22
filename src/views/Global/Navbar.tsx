@@ -20,6 +20,7 @@ import {
 } from "@mui/icons-material";
 
 import { setIsCartOpen } from "../../state/cartSlice";
+import { setStatus } from "../../state/productListSlice";
 
 export const Navbar = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -31,19 +32,19 @@ export const Navbar = () => {
   return (
     <Box
       display="flex"
-      alignItems="center"
+      alignItems="flex-start"
       width="100%"
-      height="60px"
-      bgcolor="rgba(250, 250, 250, 0.95)"
+      height="260px"
+      bgcolor="rgba(215, 215, 215, 0.85)"
       color="black"
-      position="fixed"
+      position="absolute"
       top="0"
       left="0"
-      zIndex="1"
+      zIndex="-1"
     >
       <Box
         width="80%"
-        margin="auto"
+        margin="10px auto"
         display="flex"
         justifyContent="space-between"
         alignItems="center"
@@ -51,7 +52,10 @@ export const Navbar = () => {
         <Box
           display="flex"
           alignItems="center"
-          onClick={() => navigate("/")}
+          onClick={() => {
+            navigate("/");
+            dispatch(setStatus("idle"));
+          }}
           sx={{ "&:hover": { cursor: "pointer" } }}
         >
           <IconButton sx={{ color: "black" }}>
