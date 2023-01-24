@@ -3,34 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 import { CreateProductReq, ProductEntity, CartSupply } from "types";
 
-import {
-  Box,
-  Button,
-  Paper,
-  SelectChangeEvent,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import {
   DataGrid,
   GridActionsCellItem,
-  GridCellEditStopParams,
-  GridCellEditStopReasons,
-  GridCellModesModel,
   GridColDef,
   GridRenderEditCellParams,
   GridRowId,
-  GridRowModel,
   GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarQuickFilter,
-  MuiEvent,
-  useGridApiRef,
 } from "@mui/x-data-grid";
 import {
   AddCircleOutlineOutlined,
   ArrowCircleRightOutlined,
   DeleteOutlined,
-  SaveOutlined,
+  EditOutlined,
 } from "@mui/icons-material";
 
 import { addToCart, setCartProduct } from "../../state/cartSlice";
@@ -45,19 +33,18 @@ import {
 import { NewProductForm } from "./NewProductForm";
 import { ProductSupplyForm } from "./ProductSupplyForm";
 import { ProductsGoodsListMenu } from "./ProductsGoodsListMenu";
+import { EditProductForm } from "./EditProductForm";
 
 export const ProductsList = () => {
   const navigate = useNavigate();
   const [pageSize, setPageSize] = useState(10);
   const [filter, setFilter] = useState("products");
-  const [toSave, setToSave] = useState<GridRowId[]>([]);
   const dispatch = useAppDispatch();
   const products = useAppSelector(selectAllProducts);
   const postStatus = useAppSelector((state) => state.productList.status);
   const cart = useAppSelector((state) => state.cart.cart);
-  const [openAmount, setOpenAmount] = useState(false);
 
-  // const apiRef = useGridApiRef();
+  const [openAmount, setOpenAmount] = useState(false);
 
   /*FILTER*/
 
@@ -67,6 +54,7 @@ export const ProductsList = () => {
 
   useEffect(() => {
     if (postStatus === "idle") {
+      console.log("zmiana");
       dispatch(fetchProductsList(filter!));
     }
   }, [dispatch, postStatus, filter]);
@@ -98,27 +86,30 @@ export const ProductsList = () => {
 
   /*UPDATE ACTION*/
 
-  // const handleProcessRowUpdate = (newRow: GridRowModel) => {
-  //   console.log(newRow);
-  //   return newRow;
-  // };
+  const [openEditForm, setOpenEditForm] = useState(false);
+  const [valueEditForm, setValueEditForm] = useState<ProductEntity | null>(
+    null
+  );
 
-  const handleSave = (id: GridRowId) => {
-    setToSave((prevState) => [...prevState, id]);
-  };
-
-  const updateProduct = async (product: CreateProductReq) => {
+  const updateProduct = async (product: ProductEntity) => {
     try {
-      const res = await fetch("http://localhost:3001/store/update", {
+      dispatch(setStatus("pending"));
+      await fetch("http://localhost:3001/store/update", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(product),
+        body: JSON.stringify({
+          id: valueEditForm!.id,
+          ...product,
+        }),
       });
     } catch (err) {
       console.error(err);
+    } finally {
+      dispatch(setStatus("idle"));
     }
+    setOpenEditForm(false);
   };
 
   /*DELETE ACTION*/
@@ -174,9 +165,8 @@ export const ProductsList = () => {
       headerName: "Nazwa",
       flex: 1,
       minWidth: 150,
-      editable: true,
     },
-    { field: "secondName", headerName: "Druga nazwa", flex: 1, editable: true },
+    { field: "secondName", headerName: "Druga nazwa", flex: 1 },
     { field: "qty", headerName: "Ilość", flex: 0.3, type: "number" },
     {
       field: "unit",
@@ -189,7 +179,6 @@ export const ProductsList = () => {
       field: "place",
       headerName: "Miejsce",
       flex: 0.4,
-      editable: true,
       type: "number",
       align: "center",
       headerAlign: "center",
@@ -221,12 +210,11 @@ export const ProductsList = () => {
           />,
           <GridActionsCellItem
             key={`${cellValues.id}-edit`}
-            icon={<SaveOutlined />}
+            icon={<EditOutlined />}
             label="Edit"
-            disabled={!toSave.find((id) => id === cellValues.id)}
             onClick={() => {
-              updateProduct(cellValues.row);
-              setToSave([...toSave].filter((id) => id !== cellValues.id));
+              setValueEditForm(cellValues.row);
+              setOpenEditForm(true);
             }}
             color="inherit"
           />,
@@ -244,6 +232,14 @@ export const ProductsList = () => {
 
   return (
     <>
+      {valueEditForm && (
+        <EditProductForm
+          open={openEditForm}
+          onClose={() => setOpenEditForm(false)}
+          valueForm={valueEditForm as CreateProductReq}
+          updateProduct={updateProduct}
+        />
+      )}
       <NewProductForm
         open={openProduct}
         onClose={() => setOpenProduct(false)}
@@ -254,7 +250,7 @@ export const ProductsList = () => {
         onClose={() => setOpenAmount(false)}
         setCartItem={setCartItem}
       />
-      <Box width="80%" margin="80px auto 50px auto">
+      <Box width="80%" margin="20px auto">
         <Box
           display="flex"
           justifyContent="center"
@@ -303,10 +299,10 @@ export const ProductsList = () => {
             pageSize={pageSize}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
             rowsPerPageOptions={[2, 5, 10]}
-            editMode="cell"
-            onCellEditStop={(params, event) => handleSave(params.id)}
+            // editMode="cell"
+            // onCellEditStop={(params, event) => handleSave(params.id)}
             // processRowUpdate={handleProcessRowUpdate}
-            experimentalFeatures={{ newEditingApi: true }}
+            // experimentalFeatures={{ newEditingApi: true }}
           />
         </Paper>
       </Box>
