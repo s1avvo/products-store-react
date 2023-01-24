@@ -129,7 +129,7 @@ export const Navbar = () => {
                   setAnchorEl(null);
                 }}
               >
-                Zamówienia
+                Przyjęcia
               </MenuItem>
             </Menu>
           </Box>

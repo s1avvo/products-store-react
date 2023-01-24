@@ -299,10 +299,6 @@ export const ProductsList = () => {
             pageSize={pageSize}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
             rowsPerPageOptions={[2, 5, 10]}
-            // editMode="cell"
-            // onCellEditStop={(params, event) => handleSave(params.id)}
-            // processRowUpdate={handleProcessRowUpdate}
-            // experimentalFeatures={{ newEditingApi: true }}
           />
         </Paper>
       </Box>
