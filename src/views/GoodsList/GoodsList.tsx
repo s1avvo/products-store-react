@@ -21,7 +21,7 @@ import {
   ArrowCircleRightOutlined,
 } from "@mui/icons-material";
 
-import { ProductSupplyForm } from "../ProductsList/ProductSupplyForm";
+import { SupplyForm } from "../../components/SupplyForm";
 
 export const GoodsList = () => {
   const navigate = useNavigate();
@@ -118,7 +118,7 @@ export const GoodsList = () => {
 
   return (
     <>
-      <ProductSupplyForm
+      <SupplyForm
         open={openAmount}
         onClose={() => setOpenAmount(false)}
         setCartItem={setCartItem}

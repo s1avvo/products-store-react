@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CreateProductReq } from "types";
+import { ProductEntity, CreateProductReq } from "types";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -20,7 +20,7 @@ const modalStyles = {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: "max(500px, 30%)",
-    bgcolor: "white",
+    backgroundColor: "white",
     p: 4,
     zIndex: 10,
   },
@@ -39,17 +39,12 @@ const modalStyles = {
 };
 
 interface Props {
+  name: string;
   open: boolean;
   onClose: () => void;
-  addProduct: (data: CreateProductReq) => void;
+  addOrEditProduct: (data: ProductEntity) => void;
+  valueForm: CreateProductReq;
 }
-
-const defaultValue: CreateProductReq = {
-  name: "",
-  secondName: "",
-  unit: "",
-  place: "",
-};
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -67,8 +62,8 @@ const validationSchema = Yup.object().shape({
     .required("Podaj miejsce productu"),
 });
 
-export const NewProductForm = (props: Props) => {
-  const [value, setValue] = useState<CreateProductReq>(defaultValue);
+export const AddOrEditProductForm = (props: Props) => {
+  const [value, setValue] = useState<CreateProductReq>(props.valueForm);
 
   const {
     register,
@@ -76,12 +71,12 @@ export const NewProductForm = (props: Props) => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(validationSchema) });
 
-  const addNewProduct = (data: CreateProductReq) => {
-    props.addProduct(data);
+  const addOrEditProduct = (data: ProductEntity) => {
+    props.addOrEditProduct(data);
   };
 
   useEffect(() => {
-    if (props.open) setValue(defaultValue);
+    if (props.open) setValue(props.valueForm);
   }, [props.open]);
 
   return (
@@ -92,7 +87,7 @@ export const NewProductForm = (props: Props) => {
     >
       <Box sx={modalStyles.wrapper}>
         <Typography id="modal-modal-title" variant="subtitle1">
-          Dodaj produkt:
+          {props.name}
         </Typography>
         <Divider />
         <Box sx={modalStyles.inputFields}>
@@ -159,7 +154,7 @@ export const NewProductForm = (props: Props) => {
         <Box sx={modalStyles.buttons}>
           <Button
             variant="contained"
-            onClick={handleSubmit((d) => addNewProduct(d as CreateProductReq))}
+            onClick={handleSubmit((d) => addOrEditProduct(d as ProductEntity))}
           >
             Wyślij
           </Button>

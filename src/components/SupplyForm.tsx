@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../app/redux-hooks";
 import { CartSupply } from "types";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { setIsGoodsOrSupply } from "../../state/cartSlice";
+import { setIsGoodsOrSupply } from "../state/cartSlice";
 
 const modalStyles = {
   wrapper: {
@@ -81,7 +81,7 @@ const validationSchema = Yup.object().shape({
     .required("Podaj ilość"),
 });
 
-export const ProductSupplyForm = (props: Props) => {
+export const SupplyForm = (props: Props) => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState<CartSupply>(defaultValue);
   const cartProduct = useAppSelector((state) => state.cart.cartProduct);

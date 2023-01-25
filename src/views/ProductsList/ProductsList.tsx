@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 import { CreateProductReq, ProductEntity, CartSupply } from "types";
 
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, Paper } from "@mui/material";
 import {
   DataGrid,
   GridActionsCellItem,
@@ -16,7 +16,6 @@ import {
 } from "@mui/x-data-grid";
 import {
   AddCircleOutlineOutlined,
-  ArrowCircleRightOutlined,
   DeleteOutlined,
   EditOutlined,
 } from "@mui/icons-material";
@@ -30,10 +29,17 @@ import {
   setStatus,
 } from "../../state/productListSlice";
 
-import { NewProductForm } from "./NewProductForm";
-import { ProductSupplyForm } from "./ProductSupplyForm";
+import { SupplyForm } from "../../components/SupplyForm";
 import { ProductsGoodsListMenu } from "./ProductsGoodsListMenu";
-import { EditProductForm } from "./EditProductForm";
+import { AddOrEditProductForm } from "../../components/AddOrEditProductForm";
+import { TopBox } from "../../components/TopBox";
+
+const defaultValue: CreateProductReq = {
+  name: "",
+  secondName: "",
+  unit: "",
+  place: "",
+};
 
 export const ProductsList = () => {
   const navigate = useNavigate();
@@ -44,7 +50,12 @@ export const ProductsList = () => {
   const postStatus = useAppSelector((state) => state.productList.status);
   const cart = useAppSelector((state) => state.cart.cart);
 
-  const [openAmount, setOpenAmount] = useState(false);
+  const [openAmountForm, setOpenAmountForm] = useState(false);
+  const [openEditForm, setOpenEditForm] = useState(false);
+  const [valueEditForm, setValueEditForm] = useState<ProductEntity | null>(
+    null
+  );
+  const [openAddForm, setOpenAddForm] = useState(false);
 
   /*FILTER*/
 
@@ -54,14 +65,11 @@ export const ProductsList = () => {
 
   useEffect(() => {
     if (postStatus === "idle") {
-      console.log("zmiana");
       dispatch(fetchProductsList(filter!));
     }
   }, [dispatch, postStatus, filter]);
 
   /*ADD ACTION*/
-
-  const [openProduct, setOpenProduct] = useState(false);
 
   const addProduct = async (product: CreateProductReq) => {
     try {
@@ -81,15 +89,10 @@ export const ProductsList = () => {
     } finally {
       dispatch(setStatus("idle"));
     }
-    setOpenProduct(false);
+    setOpenAddForm(false);
   };
 
   /*UPDATE ACTION*/
-
-  const [openEditForm, setOpenEditForm] = useState(false);
-  const [valueEditForm, setValueEditForm] = useState<ProductEntity | null>(
-    null
-  );
 
   const updateProduct = async (product: ProductEntity) => {
     try {
@@ -136,30 +139,10 @@ export const ProductsList = () => {
 
   const setCartItem = (cartItem: CartSupply) => {
     dispatch(addToCart(cartItem));
-    setOpenAmount(false);
+    setOpenAmountForm(false);
   };
 
   const columns: GridColDef[] = [
-    {
-      field: "Szczegóły",
-      headerName: "",
-      width: 50,
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      filterable: false,
-      renderCell: (cellValues: GridRenderEditCellParams<string>) => {
-        return [
-          <GridActionsCellItem
-            key={`${cellValues.id}-details`}
-            icon={<ArrowCircleRightOutlined />}
-            label="Details"
-            onClick={() => navigate(`/details/${cellValues.row.id}`)}
-            color="inherit"
-          />,
-        ];
-      },
-    },
     {
       field: "name",
       headerName: "Nazwa",
@@ -204,7 +187,7 @@ export const ProductsList = () => {
             }
             onClick={() => {
               dispatch(setCartProduct(cellValues.row));
-              setOpenAmount(true);
+              setOpenAmountForm(true);
             }}
             color="inherit"
           />,
@@ -233,47 +216,36 @@ export const ProductsList = () => {
   return (
     <>
       {valueEditForm && (
-        <EditProductForm
+        <AddOrEditProductForm
+          name="Edytuj product:"
           open={openEditForm}
           onClose={() => setOpenEditForm(false)}
+          addOrEditProduct={updateProduct}
           valueForm={valueEditForm as CreateProductReq}
-          updateProduct={updateProduct}
         />
       )}
-      <NewProductForm
-        open={openProduct}
-        onClose={() => setOpenProduct(false)}
-        addProduct={addProduct}
+      <AddOrEditProductForm
+        name="Dodaj product:"
+        open={openAddForm}
+        onClose={() => setOpenAddForm(false)}
+        addOrEditProduct={addProduct}
+        valueForm={defaultValue}
       />
-      <ProductSupplyForm
-        open={openAmount}
-        onClose={() => setOpenAmount(false)}
+      <SupplyForm
+        open={openAmountForm}
+        onClose={() => setOpenAmountForm(false)}
         setCartItem={setCartItem}
       />
       <Box width="80%" margin="20px auto">
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          position="relative"
-          m="15px"
-        >
-          <Box position="absolute">
-            <Typography variant="h4">
-              Lista <b>Produktów</b>
-            </Typography>
-          </Box>
-          <Box marginLeft="auto">
-            <ProductsGoodsListMenu handleFilter={handleFilter} />
-            <Button variant="contained" onClick={() => setOpenProduct(true)}>
-              Dodaj produkt
-            </Button>
-          </Box>
-        </Box>
+        <TopBox name="Productów">
+          <ProductsGoodsListMenu handleFilter={handleFilter} />
+          <Button variant="contained" onClick={() => setOpenAddForm(true)}>
+            Dodaj produkt
+          </Button>
+        </TopBox>
         <Paper
           sx={{
             margin: "0 auto",
-            // height: 'calc(100vh - 280px)',
             height: "auto",
             overflow: "auto",
             backgroundColor: "rgba(250, 250, 250, 0.95)",
@@ -298,7 +270,12 @@ export const ProductsList = () => {
             pagination
             pageSize={pageSize}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[2, 5, 10]}
+            rowsPerPageOptions={[10, 25, 50]}
+            onCellClick={(params) =>
+              params.field !== "actions"
+                ? navigate(`/details/${params.id}`)
+                : null
+            }
           />
         </Paper>
       </Box>

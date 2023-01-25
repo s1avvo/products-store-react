@@ -19,7 +19,7 @@ import {
 } from "@mui/icons-material";
 
 import { addToCart, setCartProduct } from "../../state/cartSlice";
-import { ProductSupplyForm } from "../ProductsList/ProductSupplyForm";
+import { SupplyForm } from "../../components/SupplyForm";
 
 export const SupplyList = () => {
   const navigate = useNavigate();
@@ -116,7 +116,7 @@ export const SupplyList = () => {
 
   return (
     <>
-      <ProductSupplyForm
+      <SupplyForm
         open={openAmount}
         onClose={() => setOpenAmount(false)}
         setCartItem={setCartItem}
