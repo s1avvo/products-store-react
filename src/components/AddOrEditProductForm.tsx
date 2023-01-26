@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { ProductEntity, CreateProductReq } from "types";
 import * as Yup from "yup";
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
   Box,
   Button,
   Divider,
+  MenuItem,
   Modal,
   TextField,
   Typography,
@@ -38,6 +39,11 @@ const modalStyles = {
   },
 };
 
+enum Units {
+  l = "l",
+  kg = "kg",
+}
+
 interface Props {
   name: string;
   open: boolean;
@@ -56,7 +62,9 @@ const validationSchema = Yup.object().shape({
       is: (value: string) => value?.length,
       then: (rule) => rule.min(3, "Nazwa musi zawierać min. 3 znaki"),
     }),
-  unit: Yup.string().required("Wybierz jednostkę miary"),
+  unit: Yup.mixed<Units>()
+    .oneOf(Object.values(Units), "Wybierz jednostkę miary")
+    .required(),
   place: Yup.number()
     .typeError("Pole może zawierać tylko liczby")
     .required("Podaj miejsce productu"),
@@ -69,15 +77,17 @@ export const AddOrEditProductForm = (props: Props) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: yupResolver(validationSchema) });
+  } = useForm({ resolver: yupResolver(validationSchema), mode: "all" });
 
-  const addOrEditProduct = (data: ProductEntity) => {
-    props.addOrEditProduct(data);
+  const addOrEditProduct: SubmitHandler<FieldValues> = (data) => {
+    props.addOrEditProduct(data as ProductEntity);
   };
 
+  console.log(errors.name);
+
   useEffect(() => {
-    if (props.open) setValue(props.valueForm);
-  }, [props.open]);
+    setValue(props.valueForm);
+  }, [props.open, props.valueForm]);
 
   return (
     <Modal
@@ -85,7 +95,11 @@ export const AddOrEditProductForm = (props: Props) => {
       onClose={props.onClose}
       aria-labelledby="modal-title"
     >
-      <Box sx={modalStyles.wrapper}>
+      <Box
+        sx={modalStyles.wrapper}
+        component="form"
+        onSubmit={handleSubmit(addOrEditProduct)}
+      >
         <Typography id="modal-modal-title" variant="subtitle1">
           {props.name}
         </Typography>
@@ -121,20 +135,22 @@ export const AddOrEditProductForm = (props: Props) => {
             }
           />
           <TextField
-            placeholder="j.m."
             label="j.m."
-            required
             {...register("unit")}
+            value={value.unit}
+            select
             error={!!errors.unit}
             helperText={errors.unit?.message as string}
-            value={value.unit}
             onChange={(event) =>
               setValue((prevState) => ({
                 ...prevState,
                 unit: event.target.value,
               }))
             }
-          />
+          >
+            <MenuItem value={Units.l}>l</MenuItem>
+            <MenuItem value={Units.kg}>kg</MenuItem>
+          </TextField>
           <TextField
             placeholder="Miejsce"
             label="Miejsce"
@@ -152,10 +168,7 @@ export const AddOrEditProductForm = (props: Props) => {
           />
         </Box>
         <Box sx={modalStyles.buttons}>
-          <Button
-            variant="contained"
-            onClick={handleSubmit((d) => addOrEditProduct(d as ProductEntity))}
-          >
+          <Button variant="contained" type="submit">
             Wyślij
           </Button>
           <Button onClick={props.onClose}>Cancel</Button>
