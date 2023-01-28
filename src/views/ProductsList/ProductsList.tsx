@@ -9,7 +9,6 @@ import {
   GridActionsCellItem,
   GridColDef,
   GridRenderEditCellParams,
-  GridRowId,
   GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarQuickFilter,
@@ -22,11 +21,11 @@ import {
 
 import { addToCart, setCartProduct } from "../../state/cartSlice";
 import {
-  addToProductsList,
-  fetchProductsList,
-  removeToProductsList,
   selectAllProducts,
-  setStatus,
+  fetchProductsList,
+  addProductToList,
+  updateProductOnList,
+  deleteProductFromList,
 } from "../../state/productListSlice";
 
 import { SupplyForm } from "../../components/SupplyForm";
@@ -42,14 +41,15 @@ const defaultValue: CreateProductReq = {
 };
 
 export const ProductsList = () => {
-  const navigate = useNavigate();
-  const [pageSize, setPageSize] = useState(10);
-  const [filter, setFilter] = useState("products");
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const products = useAppSelector(selectAllProducts);
   const postStatus = useAppSelector((state) => state.productList.status);
   const cart = useAppSelector((state) => state.cart.cart);
 
+  const [pageSize, setPageSize] = useState(25);
+  const [filter, setFilter] = useState("products");
   const [openAmountForm, setOpenAmountForm] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
   const [valueEditForm, setValueEditForm] = useState<ProductEntity | null>(
@@ -63,76 +63,32 @@ export const ProductsList = () => {
     setFilter(filter);
   };
 
-  useEffect(() => {
-    if (postStatus === "idle") {
-      dispatch(fetchProductsList(filter!));
-    }
-  }, [dispatch, postStatus, filter]);
+  /*GET ACTION*/
 
-  /*ADD ACTION*/
+  const getProductsList = async () => {
+    await dispatch(fetchProductsList(filter!))
+      .unwrap()
+      .catch((err) => console.log(err.message));
+  };
 
-  const addProduct = async (product: CreateProductReq) => {
-    try {
-      dispatch(setStatus("pending"));
-      const res = await fetch("http://localhost:3001/store/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      });
+  /*POST ACTION*/
 
-      const newProduct: ProductEntity = await res.json();
-      dispatch(addToProductsList(newProduct));
-    } catch (err) {
-      console.error("Failed to save the new product: ", err);
-    } finally {
-      dispatch(setStatus("idle"));
-    }
+  const handleAddProduct = async (product: CreateProductReq) => {
+    await dispatch(addProductToList(product))
+      .unwrap()
+      .catch((err) => console.log(err.message));
+
     setOpenAddForm(false);
   };
 
-  /*UPDATE ACTION*/
+  /*PUT ACTION*/
 
-  const updateProduct = async (product: ProductEntity) => {
-    try {
-      dispatch(setStatus("pending"));
-      await fetch("http://localhost:3001/store/update", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: valueEditForm!.id,
-          ...product,
-        }),
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      dispatch(setStatus("idle"));
-    }
+  const handleUpdateProduct = async (product: ProductEntity) => {
+    await dispatch(updateProductOnList({ id: valueEditForm!.id, ...product }))
+      .unwrap()
+      .catch((err) => console.log(err.message));
+
     setOpenEditForm(false);
-  };
-
-  /*DELETE ACTION*/
-
-  const handleDeleteClick = async (id: GridRowId) => {
-    try {
-      dispatch(setStatus("pending"));
-      await fetch("http://localhost:3001/store/delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
-      });
-      dispatch(removeToProductsList({ id }));
-    } catch (err) {
-      console.error("Failed to delete the product: ", err);
-    } finally {
-      dispatch(setStatus("idle"));
-    }
   };
 
   /*SET CART ITEM*/
@@ -141,6 +97,12 @@ export const ProductsList = () => {
     dispatch(addToCart(cartItem));
     setOpenAmountForm(false);
   };
+
+  useEffect(() => {
+    if (postStatus === "idle") {
+      getProductsList();
+    }
+  }, [postStatus]);
 
   const columns: GridColDef[] = [
     {
@@ -205,7 +167,9 @@ export const ProductsList = () => {
             key={`${cellValues.id}-delete`}
             icon={<DeleteOutlined />}
             label="Delete"
-            onClick={() => handleDeleteClick(cellValues.id)}
+            onClick={() =>
+              dispatch(deleteProductFromList(cellValues.id as string))
+            }
             color="inherit"
           />,
         ];
@@ -220,7 +184,7 @@ export const ProductsList = () => {
           name="Edytuj product:"
           open={openEditForm}
           onClose={() => setOpenEditForm(false)}
-          addOrEditProduct={updateProduct}
+          addOrEditProduct={handleUpdateProduct}
           valueForm={valueEditForm as CreateProductReq}
         />
       )}
@@ -228,7 +192,7 @@ export const ProductsList = () => {
         name="Dodaj product:"
         open={openAddForm}
         onClose={() => setOpenAddForm(false)}
-        addOrEditProduct={addProduct}
+        addOrEditProduct={handleAddProduct}
         valueForm={defaultValue}
       />
       <SupplyForm
@@ -263,7 +227,7 @@ export const ProductsList = () => {
                 </GridToolbarContainer>
               ),
             }}
-            loading={postStatus === "loading"}
+            loading={postStatus === "pending"}
             autoHeight={true}
             sx={{ padding: "10px" }}
             disableSelectionOnClick
