@@ -83,8 +83,6 @@ export const AddOrEditProductForm = (props: Props) => {
     props.addOrEditProduct(data as ProductEntity);
   };
 
-  console.log(errors.name);
-
   useEffect(() => {
     setValue(props.valueForm);
   }, [props.open, props.valueForm]);

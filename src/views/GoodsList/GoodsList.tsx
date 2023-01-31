@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
-import { CartSupply, OrderViewEntity } from "types";
+import { Cart, OrderViewEntity } from "types";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { addToCart, setCartProduct } from "../../state/cartSlice";
 import {
   DataGrid,
@@ -16,58 +16,42 @@ import {
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 
-import {
-  AddCircleOutlineOutlined,
-  ArrowCircleRightOutlined,
-} from "@mui/icons-material";
+import { AddCircleOutlineOutlined } from "@mui/icons-material";
 
 import { SupplyForm } from "../../components/SupplyForm";
 
-export const GoodsList = () => {
+interface Props {
+  filter: string;
+}
+
+export const GoodsList = (props: Props) => {
   const navigate = useNavigate();
-  const [goodsList, setGoodsList] = useState<OrderViewEntity[]>([]);
-  const [pageSize, setPageSize] = useState(10);
-  const [openAmount, setOpenAmount] = useState(false);
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart.cart);
 
+  const [goodsList, setGoodsList] = useState<OrderViewEntity[]>([]);
+  const [pageSize, setPageSize] = useState(25);
+  const [openAmount, setOpenAmount] = useState(false);
+
   async function getItems() {
-    const res = await fetch("http://localhost:3001/goods", { method: "GET" });
+    const res = await fetch(`http://localhost:3001/${props.filter}`, {
+      method: "GET",
+    });
     setGoodsList(await res.json());
   }
 
   useEffect(() => {
     getItems();
-  }, []);
+  }, [props.filter]);
 
   /*SET CART ITEM*/
 
-  const setCartItem = (cartItem: CartSupply) => {
+  const setCartItem = (cartItem: Cart) => {
     dispatch(addToCart(cartItem));
     setOpenAmount(false);
   };
 
   const columns: GridColDef[] = [
-    {
-      field: "Szczegóły",
-      headerName: "",
-      width: 50,
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      filterable: false,
-      renderCell: (cellValues: GridRenderEditCellParams<string>) => {
-        return [
-          <GridActionsCellItem
-            key={`${cellValues.id}-details`}
-            icon={<ArrowCircleRightOutlined />}
-            label="Details"
-            onClick={() => navigate(`/details/${cellValues.row.id}`)}
-            color="inherit"
-          />,
-        ];
-      },
-    },
     { field: "name", headerName: "Nazwa", flex: 1, minWidth: 150 },
     { field: "qty", headerName: "Stan", flex: 0.5, type: "number" },
     {
@@ -101,9 +85,7 @@ export const GoodsList = () => {
             icon={<AddCircleOutlineOutlined />}
             label="Add"
             disabled={
-              !!cart.find(
-                (item: CartSupply) => item.productId === cellValues.row.id
-              )
+              !!cart.find((item) => item.productId === cellValues.row.id)
             }
             onClick={() => {
               dispatch(setCartProduct(cellValues.row));
@@ -123,7 +105,7 @@ export const GoodsList = () => {
         onClose={() => setOpenAmount(false)}
         setCartItem={setCartItem}
       />
-      <Box width="80%" margin="80px auto 50px auto">
+      <Box width="80%" margin="20px auto">
         <Box
           display="flex"
           justifyContent="center"
@@ -134,7 +116,15 @@ export const GoodsList = () => {
             Lista <b>Wydań</b>
           </Typography>
         </Box>
-        <Box margin="0 auto" height="75vh">
+        <Paper
+          sx={{
+            margin: "0 auto",
+            height: "auto",
+            overflow: "auto",
+            backgroundColor: "rgba(250, 250, 250, 0.95)",
+            zIndex: "10",
+          }}
+        >
           <DataGrid
             rows={goodsList}
             columns={columns}
@@ -150,13 +140,18 @@ export const GoodsList = () => {
             loading={!goodsList.length}
             sx={{ padding: "10px" }}
             disableSelectionOnClick
-            // autoPageSize={true}
+            autoHeight={true}
             pagination
             pageSize={pageSize}
             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[10, 25, 50]}
+            onCellClick={(params) =>
+              params.field !== "actions"
+                ? navigate(`/details/${params.row.id}`)
+                : null
+            }
           />
-        </Box>
+        </Paper>
       </Box>
     </>
   );

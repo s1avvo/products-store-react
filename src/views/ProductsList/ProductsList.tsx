@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
-import { CreateProductReq, ProductEntity, CartSupply } from "types";
+import { CreateProductReq, ProductEntity, Cart } from "types";
 
 import { Box, Button, Paper } from "@mui/material";
 import {
@@ -93,7 +93,7 @@ export const ProductsList = () => {
 
   /*SET CART ITEM*/
 
-  const setCartItem = (cartItem: CartSupply) => {
+  const setCartItem = (cartItem: Cart) => {
     dispatch(addToCart(cartItem));
     setOpenAmountForm(false);
   };
@@ -143,9 +143,7 @@ export const ProductsList = () => {
             icon={<AddCircleOutlineOutlined />}
             label="Add"
             disabled={
-              !!cart.find(
-                (item: CartSupply) => item.productId === cellValues.row.id
-              )
+              !!cart.find((item) => item.productId === cellValues.row.id)
             }
             onClick={() => {
               dispatch(setCartProduct(cellValues.row));
@@ -237,7 +235,7 @@ export const ProductsList = () => {
             rowsPerPageOptions={[10, 25, 50]}
             onCellClick={(params) =>
               params.field !== "actions"
-                ? navigate(`/details/${params.id}`)
+                ? navigate(`/details/${params.row.id}`)
                 : null
             }
           />

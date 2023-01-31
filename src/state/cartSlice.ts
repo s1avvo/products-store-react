@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CartSupply, ProductEntity } from "types";
+import { Cart, ProductEntity } from "types";
 
 interface CartState {
   isCartOpen: boolean;
-  isGoodsOrSupply: "goods" | "supply";
-  cart: CartSupply[];
+  goodsIssueOrReception: "goodsIssue" | "goodsReception";
+  cart: Cart[];
   cartProduct: ProductEntity;
   productsList: ProductEntity[];
 }
 
 const initialState: CartState = {
   isCartOpen: false,
-  isGoodsOrSupply: "goods",
+  goodsIssueOrReception: "goodsIssue",
   cart: [],
   cartProduct: {} as ProductEntity,
   productsList: [],
@@ -25,7 +25,7 @@ export const cartSlice = createSlice({
       state.cartProduct = action.payload;
     },
 
-    addToCart: (state, action: PayloadAction<CartSupply>) => {
+    addToCart: (state, action: PayloadAction<Cart>) => {
       state.cart = [...state.cart, action.payload];
     },
 
@@ -37,8 +37,11 @@ export const cartSlice = createSlice({
     setIsCartOpen: (state) => {
       state.isCartOpen = !state.isCartOpen;
     },
-    setIsGoodsOrSupply: (state, action: PayloadAction<"goods" | "supply">) => {
-      state.isGoodsOrSupply = action.payload;
+    setGoodsIssueOrReception: (
+      state,
+      action: PayloadAction<"goodsIssue" | "goodsReception">
+    ) => {
+      state.goodsIssueOrReception = action.payload;
     },
     clearCart: (state) => {
       state.cart = [];
@@ -50,7 +53,7 @@ export const {
   addToCart,
   removeFromCart,
   setIsCartOpen,
-  setIsGoodsOrSupply,
+  setGoodsIssueOrReception,
   clearCart,
   setCartProduct,
 } = cartSlice.actions;

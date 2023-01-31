@@ -24,7 +24,7 @@ export const fetchProductsList = createAsyncThunk(
       const response = await fetch(`http://localhost:3001/${path}`, {
         method: "GET",
       });
-      return response.json();
+      return await response.json();
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -42,7 +42,7 @@ export const addProductToList = createAsyncThunk(
         },
         body: JSON.stringify(product),
       });
-      return response.json();
+      return await response.json();
     } catch (err) {
       return rejectWithValue(err);
     }
@@ -60,7 +60,7 @@ export const updateProductOnList = createAsyncThunk(
         },
         body: JSON.stringify(product),
       });
-      return response.json();
+      return await response.json();
     } catch (err) {
       return rejectWithValue(err);
     }

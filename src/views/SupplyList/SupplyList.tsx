@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
-import { CartSupply, OrderViewEntity } from "types";
+import { Cart, OrderViewEntity } from "types";
 
 import { Box, Typography } from "@mui/material";
 import {
@@ -39,7 +39,7 @@ export const SupplyList = () => {
   }, []);
   /*SET CART ITEM*/
 
-  const setCartItem = (cartItem: CartSupply) => {
+  const setCartItem = (cartItem: Cart) => {
     dispatch(addToCart(cartItem));
     setOpenAmount(false);
   };
@@ -99,9 +99,7 @@ export const SupplyList = () => {
             icon={<AddCircleOutlineOutlined />}
             label="Add"
             disabled={
-              !!cart.find(
-                (item: CartSupply) => item.productId === cellValues.row.id
-              )
+              !!cart.find((item) => item.productId === cellValues.row.id)
             }
             onClick={() => {
               dispatch(setCartProduct(cellValues.row));

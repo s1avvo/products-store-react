@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/redux-hooks";
-import { CartSupply } from "types";
+import { Cart } from "types";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { setIsGoodsOrSupply } from "../state/cartSlice";
+import { setGoodsIssueOrReception } from "../state/cartSlice";
 
 const modalStyles = {
   wrapper: {
@@ -45,33 +45,27 @@ const modalStyles = {
   },
 };
 
-const PERSONS = {
-  0: "Katarzyna Nadolna",
-  1: "Dorota Olender",
-  2: "Anna Pawełczyk",
-  3: "Katarzyna Sowa",
-  4: "Barbara Cwynar",
-  5: "Justyna Żwawiak",
-  6: "Marek Bernard",
-  7: "Joanna Warguła",
-};
-
-// const STATUS = {
-//   0: "Oczekujące",
-//   1: "Zrealizowane",
-//   2: "Anulowane",
-// };
+enum PERSONS {
+  knadolna = "Katarzyna Nadolna",
+  dolender = "Dorota Olender",
+  apawelczyk = "Anna Pawełczyk",
+  ksowa = "Katarzyna Sowa",
+  bcwynar = "Barbara Cwynar",
+  jzwawik = "Justyna Żwawiak",
+  mbednard = "Marek Bernard",
+  jwargula = "Joanna Warguła",
+}
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  setCartItem: (data: CartSupply) => void;
+  setCartItem: (data: Cart) => void;
 }
 
-const defaultValue: CartSupply = {
+const defaultValue: Cart = {
   name: "",
   amount: parseInt(""),
-  person: PERSONS["0"],
+  person: PERSONS.knadolna,
   productId: "",
 };
 
@@ -83,12 +77,16 @@ const validationSchema = Yup.object().shape({
 
 export const SupplyForm = (props: Props) => {
   const dispatch = useAppDispatch();
-  const [value, setValue] = useState<CartSupply>(defaultValue);
+  const [value, setValue] = useState<Cart>(defaultValue);
   const cartProduct = useAppSelector((state) => state.cart.cartProduct);
-  const cartType = useAppSelector((state) => state.cart.isGoodsOrSupply);
+  const cartType = useAppSelector((state) => state.cart.goodsIssueOrReception);
 
   const handleChangeCartType = (event: SelectChangeEvent) => {
-    dispatch(setIsGoodsOrSupply(event.target.value as "goods" | "supply"));
+    dispatch(
+      setGoodsIssueOrReception(
+        event.target.value as "goodsIssue" | "goodsReception"
+      )
+    );
   };
 
   const {
@@ -97,7 +95,7 @@ export const SupplyForm = (props: Props) => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(validationSchema) });
 
-  const setCartItem = (data: CartSupply) => {
+  const setCartItem = (data: Cart) => {
     props.setCartItem({
       ...data,
       person: value.person,
@@ -131,11 +129,11 @@ export const SupplyForm = (props: Props) => {
               label="Koszyk"
               onChange={handleChangeCartType}
             >
-              <MenuItem value="goods">
+              <MenuItem value="goodsIssue">
                 <Typography variant="h6">Wydanie</Typography>
               </MenuItem>
-              <MenuItem value="supply">
-                <Typography variant="h6">Zamówienie</Typography>
+              <MenuItem value="goodsReception">
+                <Typography variant="h6">Przyjęcie</Typography>
               </MenuItem>
             </Select>
           </FormControl>
@@ -159,60 +157,34 @@ export const SupplyForm = (props: Props) => {
               }))
             }
           />
-          {cartType === "goods" && (
-            <FormControl size="small">
-              <InputLabel id="person-select-label">Osoba</InputLabel>
-              <Select
-                labelId="person-select-label"
-                id="person-select"
-                value={value?.person}
-                label="Osoba"
-                onChange={(event) =>
-                  setValue((prevState) => ({
-                    ...prevState,
-                    person: event.target.value,
-                  }))
-                }
-              >
-                <MenuItem value={PERSONS["0"]}>{PERSONS["0"]}</MenuItem>
-                <MenuItem value={PERSONS["1"]}>{PERSONS["1"]}</MenuItem>
-                <MenuItem value={PERSONS["2"]}>{PERSONS["2"]}</MenuItem>
-                <MenuItem value={PERSONS["3"]}>{PERSONS["3"]}</MenuItem>
-                <MenuItem value={PERSONS["4"]}>{PERSONS["4"]}</MenuItem>
-                <MenuItem value={PERSONS["5"]}>{PERSONS["5"]}</MenuItem>
-                <MenuItem value={PERSONS["6"]}>{PERSONS["6"]}</MenuItem>
-                <MenuItem value={PERSONS["7"]}>{PERSONS["7"]}</MenuItem>
-              </Select>
-            </FormControl>
-          )}
-          {/*{cartType === "supply" && (*/}
-          {/*  <FormControl size="small">*/}
-          {/*    <InputLabel id="status-select-label">Status</InputLabel>*/}
-          {/*    <Select*/}
-          {/*      labelId="status-select-label"*/}
-          {/*      id="status-select"*/}
-          {/*      value={value.status}*/}
-          {/*      label="Status"*/}
-          {/*      onChange={(event) =>*/}
-          {/*        setValue((prevState) => ({*/}
-          {/*          ...prevState,*/}
-          {/*          status: event.target.value,*/}
-          {/*        }))*/}
-          {/*      }*/}
-          {/*    >*/}
-          {/*      <MenuItem value={STATUS["0"]}>{STATUS["0"]}</MenuItem>*/}
-          {/*      <MenuItem value={STATUS["1"]}>{STATUS["1"]}</MenuItem>*/}
-          {/*      <MenuItem value={STATUS["2"]}>{STATUS["2"]}</MenuItem>*/}
-          {/*    </Select>*/}
-          {/*  </FormControl>*/}
-          {/*)}*/}
+          <FormControl size="small">
+            <InputLabel id="person-select-label">Osoba</InputLabel>
+            <Select
+              labelId="person-select-label"
+              id="person-select"
+              value={value?.person}
+              label="Osoba"
+              onChange={(event) =>
+                setValue((prevState) => ({
+                  ...prevState,
+                  person: event.target.value,
+                }))
+              }
+            >
+              {Object.entries(PERSONS).map(([key, value]) => (
+                <MenuItem key={key} value={value}>
+                  {value}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
         <Box sx={modalStyles.buttons}>
           <Button
             variant="contained"
-            onClick={handleSubmit((d) => setCartItem(d as CartSupply))}
+            onClick={handleSubmit((d) => setCartItem(d as Cart))}
           >
-            {cartType === "goods" ? <span>Wydaj</span> : <span>Zamów</span>}
+            <span>Wyślij</span>
           </Button>
           <Button onClick={props.onClose}>Cancel</Button>
         </Box>

@@ -1,5 +1,4 @@
 import React, { FormEvent } from "react";
-import { CartSupply } from "types";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
 import {
@@ -21,7 +20,7 @@ import {
   clearCart,
   removeFromCart,
   setIsCartOpen,
-  setIsGoodsOrSupply,
+  setGoodsIssueOrReception,
 } from "../../state/cartSlice";
 
 import { setStatus, updateQty } from "../../state/productListSlice";
@@ -35,51 +34,39 @@ const FlexBox = styled(Box)`
 export const Cart = () => {
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart.cart);
-  const cartType = useAppSelector((state) => state.cart.isGoodsOrSupply);
+  const cartType = useAppSelector((state) => state.cart.goodsIssueOrReception);
   const isCartOpen = useAppSelector((state) => state.cart.isCartOpen);
 
   const handleChangeCartType = (event: SelectChangeEvent) => {
-    dispatch(setIsGoodsOrSupply(event.target.value as "goods" | "supply"));
+    dispatch(
+      setGoodsIssueOrReception(
+        event.target.value as "goodsIssue" | "goodsReception"
+      )
+    );
   };
 
-  const handelSupply = async (event: FormEvent) => {
+  const handelGoodsReception = (event: FormEvent) => {
     event.preventDefault();
 
-    try {
-      const supplyId = await fetch(`http://localhost:3001/store/supply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          person: "Katarzyna Nadolna",
-        }),
-      });
-      const id = await supplyId.json();
-
-      await handelSupplyItems(id.supplyId);
-      dispatch(clearCart());
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const handelSupplyItems = (supplyId: string) => {
-    cart.map(async (item: CartSupply) => {
+    cart.map(async (item) => {
       try {
         dispatch(setStatus("pending"));
-        await fetch(`http://localhost:3001/store/supply/item`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: item.amount,
-            productId: item.productId,
-            supplyId: supplyId,
-          }),
-        });
+        await fetch(
+          `http://localhost:3001/store/goods-reception/${item.productId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              amount: item.amount,
+              person: item.person,
+              productId: item.productId,
+            }),
+          }
+        );
         dispatch(updateQty({ id: item.productId, qty: item.amount }));
+        dispatch(clearCart());
       } catch (err) {
         console.error(err);
       } finally {
@@ -88,23 +75,26 @@ export const Cart = () => {
     });
   };
 
-  const handelGoods = (event: FormEvent) => {
+  const handelGoodsIssue = (event: FormEvent) => {
     event.preventDefault();
 
-    cart.map(async (item: CartSupply) => {
+    cart.map(async (item) => {
       try {
         dispatch(setStatus("pending"));
-        await fetch(`http://localhost:3001/store/goods/${item.productId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: item.amount,
-            person: item.person,
-            productId: item.productId,
-          }),
-        });
+        await fetch(
+          `http://localhost:3001/store/goods-issue/${item.productId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              amount: item.amount,
+              person: item.person,
+              productId: item.productId,
+            }),
+          }
+        );
         dispatch(updateQty({ id: item.productId, qty: -item.amount }));
         dispatch(clearCart());
       } catch (err) {
@@ -133,7 +123,9 @@ export const Cart = () => {
         height="100%"
         bgcolor="white"
         component="form"
-        onSubmit={cartType === "goods" ? handelGoods : handelSupply}
+        onSubmit={
+          cartType === "goodsIssue" ? handelGoodsIssue : handelGoodsReception
+        }
       >
         <Box padding="30px" overflow="auto" height="100%">
           {/* HEADER */}
@@ -147,12 +139,12 @@ export const Cart = () => {
                 label="Koszyk"
                 onChange={handleChangeCartType}
               >
-                <MenuItem value="goods">
+                <MenuItem value="goodsIssue">
                   <Typography variant="h5">Wydanie ({cart.length})</Typography>
                 </MenuItem>
-                <MenuItem value="supply">
+                <MenuItem value="goodsReception">
                   <Typography variant="h5">
-                    Zamówienie ({cart.length})
+                    Przyjęcie ({cart.length})
                   </Typography>
                 </MenuItem>
               </Select>
@@ -160,7 +152,7 @@ export const Cart = () => {
           </Box>
 
           {/* CART LIST */}
-          {cart.map((item: CartSupply) => (
+          {cart.map((item) => (
             <Box key={`${item.productId}`}>
               <FlexBox p="15px 0">
                 <Box flex="1 1 60%">
@@ -196,7 +188,7 @@ export const Cart = () => {
                 dispatch(setIsCartOpen());
               }}
             >
-              {cartType === "goods" ? <span>Wydaj</span> : <span>Zamów</span>}
+              Wyślij
             </Button>
             <Button onClick={() => dispatch(setIsCartOpen())}>Cancel</Button>
           </Box>
