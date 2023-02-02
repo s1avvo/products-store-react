@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 import { CreateProductReq, ProductEntity, Cart } from "types";
 
-import { Box, Button, Paper } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import {
-  DataGrid,
   GridActionsCellItem,
   GridColDef,
   GridRenderEditCellParams,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import {
   AddCircleOutlineOutlined,
@@ -32,6 +27,7 @@ import { SupplyForm } from "../../components/SupplyForm";
 import { ProductsGoodsListMenu } from "./ProductsGoodsListMenu";
 import { AddOrEditProductForm } from "../../components/AddOrEditProductForm";
 import { TopBox } from "../../components/TopBox";
+import { ProductsDataGrid } from "../../components/ProductsDataGrid";
 
 const defaultValue: CreateProductReq = {
   name: "",
@@ -42,13 +38,11 @@ const defaultValue: CreateProductReq = {
 
 export const ProductsList = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const products = useAppSelector(selectAllProducts);
   const postStatus = useAppSelector((state) => state.productList.status);
   const cart = useAppSelector((state) => state.cart.cart);
 
-  const [pageSize, setPageSize] = useState(25);
   const [filter, setFilter] = useState("products");
   const [openAmountForm, setOpenAmountForm] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
@@ -205,41 +199,11 @@ export const ProductsList = () => {
             Dodaj produkt
           </Button>
         </TopBox>
-        <Paper
-          sx={{
-            margin: "0 auto",
-            height: "auto",
-            overflow: "auto",
-            backgroundColor: "rgba(250, 250, 250, 0.95)",
-            zIndex: "10",
-          }}
-        >
-          <DataGrid
-            rows={products}
-            columns={columns}
-            components={{
-              Toolbar: () => (
-                <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
-                  <GridToolbarColumnsButton />
-                  <GridToolbarQuickFilter />
-                </GridToolbarContainer>
-              ),
-            }}
-            loading={postStatus === "pending"}
-            autoHeight={true}
-            sx={{ padding: "10px" }}
-            disableSelectionOnClick
-            pagination
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[10, 25, 50]}
-            onCellClick={(params) =>
-              params.field !== "actions"
-                ? navigate(`/details/${params.row.id}`)
-                : null
-            }
-          />
-        </Paper>
+        <ProductsDataGrid
+          rows={products}
+          columns={columns}
+          postStatus={postStatus}
+        />
       </Box>
     </>
   );
