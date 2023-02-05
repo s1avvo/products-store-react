@@ -1,36 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
 import { Cart, OrderViewEntity } from "types";
 
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { addToCart, setCartProduct } from "../../state/cartSlice";
 import {
-  DataGrid,
   GridActionsCellItem,
   GridColDef,
   GridRenderEditCellParams,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 
 import { AddCircleOutlineOutlined } from "@mui/icons-material";
 
 import { SupplyForm } from "../../components/SupplyForm";
+import { GoodsDataGrid } from "../../components/GoodsDataGrid";
 
 interface Props {
   filter: string;
 }
 
 export const GoodsList = (props: Props) => {
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart.cart);
 
   const [goodsList, setGoodsList] = useState<OrderViewEntity[]>([]);
-  const [pageSize, setPageSize] = useState(25);
   const [openAmount, setOpenAmount] = useState(false);
 
   async function getItems() {
@@ -113,45 +107,18 @@ export const GoodsList = (props: Props) => {
           m="15px"
         >
           <Typography variant="h4">
-            Lista <b>Wydań</b>
+            {props.filter === "goods" ? (
+              <>
+                Lista <b>Wydań produktów</b>
+              </>
+            ) : (
+              <>
+                Lista <b>Przyjęć produktów</b>
+              </>
+            )}
           </Typography>
         </Box>
-        <Paper
-          sx={{
-            margin: "0 auto",
-            height: "auto",
-            overflow: "auto",
-            backgroundColor: "rgba(250, 250, 250, 0.95)",
-            zIndex: "10",
-          }}
-        >
-          <DataGrid
-            rows={goodsList}
-            columns={columns}
-            getRowId={(row: OrderViewEntity) => row.idItem}
-            components={{
-              Toolbar: () => (
-                <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
-                  <GridToolbarColumnsButton />
-                  <GridToolbarQuickFilter />
-                </GridToolbarContainer>
-              ),
-            }}
-            loading={!goodsList.length}
-            sx={{ padding: "10px" }}
-            disableSelectionOnClick
-            autoHeight={true}
-            pagination
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[10, 25, 50]}
-            onCellClick={(params) =>
-              params.field !== "actions"
-                ? navigate(`/details/${params.row.id}`)
-                : null
-            }
-          />
-        </Paper>
+        <GoodsDataGrid rows={goodsList} columns={columns} />
       </Box>
     </>
   );
