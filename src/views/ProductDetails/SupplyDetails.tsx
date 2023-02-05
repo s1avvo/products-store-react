@@ -1,18 +1,14 @@
-import { Box, Tab, Tabs } from "@mui/material";
 import React, { useState } from "react";
-import { GoodsEntity, SupplyEntity } from "types";
+import { GoodsEntity } from "types";
 import { TabPanel } from "./TabPanel";
-import {
-  DataGrid,
-  GridColDef,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
-} from "@mui/x-data-grid";
+import { ProductDetailsDataGrid } from "./ProductDetailsDataGrid";
+
+import { Box, Tab, Tabs } from "@mui/material";
+import { GridColDef } from "@mui/x-data-grid";
 
 interface Props {
-  goods: GoodsEntity[];
-  supply: SupplyEntity[];
+  goodsIssue: GoodsEntity[];
+  goodsReception: GoodsEntity[];
 }
 
 export const SupplyDetails = (props: Props) => {
@@ -49,53 +45,17 @@ export const SupplyDetails = (props: Props) => {
         </Tabs>
       </Box>
       <TabPanel index="goods" value={value}>
-        <div style={{ height: "75vh", width: "100%" }}>
-          <DataGrid
-            rows={props.goods}
-            columns={columns}
-            getRowId={(row) => row.productId}
-            components={{
-              Toolbar: () => (
-                <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
-                  <GridToolbarColumnsButton />
-                  <GridToolbarQuickFilter />
-                </GridToolbarContainer>
-              ),
-            }}
-            loading={!props.goods.length}
-            sx={{ padding: "10px" }}
-            disableSelectionOnClick
-            autoPageSize={true}
-            pagination
-            initialState={{
-              sorting: { sortModel: [{ field: "data", sort: "asc" }] },
-            }}
-          />
-        </div>
+        {props.goodsIssue.length !== 0 && (
+          <ProductDetailsDataGrid rows={props.goodsIssue} columns={columns} />
+        )}
       </TabPanel>
       <TabPanel index={"orders"} value={value}>
-        <div style={{ height: "75vh", width: "100%" }}>
-          <DataGrid
-            rows={props.supply}
+        {props.goodsReception.length !== 0 && (
+          <ProductDetailsDataGrid
+            rows={props.goodsReception}
             columns={columns}
-            loading={!props.supply.length}
-            sx={{ padding: "10px" }}
-            components={{
-              Toolbar: () => (
-                <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
-                  <GridToolbarColumnsButton />
-                  <GridToolbarQuickFilter />
-                </GridToolbarContainer>
-              ),
-            }}
-            disableSelectionOnClick
-            autoPageSize={true}
-            pagination
-            initialState={{
-              sorting: { sortModel: [{ field: "data", sort: "asc" }] },
-            }}
           />
-        </div>
+        )}
       </TabPanel>
     </Box>
   );
