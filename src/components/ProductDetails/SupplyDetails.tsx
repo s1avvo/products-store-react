@@ -40,8 +40,12 @@ export const SupplyDetails = (props: Props) => {
           onChange={handleChange}
           aria-label="product-details-tabs"
         >
-          <Tab label="WYDANIA" value="goods" />
-          <Tab label="ZAMÓWIENIA" value="orders" />
+          {props.goodsIssue.length !== 0 && (
+            <Tab label="WYDANIA" value="goods" />
+          )}
+          {props.goodsReception.length !== 0 && (
+            <Tab label="ZAMÓWIENIA" value="orders" />
+          )}
         </Tabs>
       </Box>
       <TabPanel index="goods" value={value}>

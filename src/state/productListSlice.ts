@@ -134,3 +134,6 @@ export const productListReducer = productListSlice.reducer;
 
 export const selectAllProducts = (state: RootState) =>
   state.productList.productsList;
+
+export const selectSingleProduct = (state: RootState, productId: string) =>
+  state.productList.productsList.find((item) => item.id === productId);
