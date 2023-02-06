@@ -11,7 +11,7 @@ interface Props {
   goodsReception: GoodsEntity[];
 }
 
-export const SupplyDetails = (props: Props) => {
+export const SupplyDetails = ({ goodsIssue, goodsReception }: Props) => {
   const [value, setValue] = useState("goods");
 
   const columns: GridColDef[] = [
@@ -25,7 +25,6 @@ export const SupplyDetails = (props: Props) => {
     },
     { field: "amount", headerName: "Ilość", flex: 0.75, type: "number" },
     { field: "person", headerName: "Osoba", flex: 2 },
-    { field: "status", headerName: "Status", flex: 0.75 },
   ];
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -40,25 +39,18 @@ export const SupplyDetails = (props: Props) => {
           onChange={handleChange}
           aria-label="product-details-tabs"
         >
-          {props.goodsIssue.length !== 0 && (
-            <Tab label="WYDANIA" value="goods" />
-          )}
-          {props.goodsReception.length !== 0 && (
-            <Tab label="ZAMÓWIENIA" value="orders" />
-          )}
+          <Tab label="WYDANIA" value="goods" />
+          <Tab label="ZAMÓWIENIA" value="orders" />
         </Tabs>
       </Box>
       <TabPanel index="goods" value={value}>
-        {props.goodsIssue.length !== 0 && (
-          <ProductDetailsDataGrid rows={props.goodsIssue} columns={columns} />
+        {goodsIssue.length !== 0 && (
+          <ProductDetailsDataGrid rows={goodsIssue} columns={columns} />
         )}
       </TabPanel>
       <TabPanel index={"orders"} value={value}>
-        {props.goodsReception.length !== 0 && (
-          <ProductDetailsDataGrid
-            rows={props.goodsReception}
-            columns={columns}
-          />
+        {goodsReception.length !== 0 && (
+          <ProductDetailsDataGrid rows={goodsReception} columns={columns} />
         )}
       </TabPanel>
     </Box>

@@ -8,6 +8,7 @@ import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDet
 
 import { GoodsEntity } from "types";
 import { Box, Paper, Typography } from "@mui/material";
+import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
 
 export const ProductDetails = () => {
   const { productId } = useParams();
@@ -53,6 +54,7 @@ export const ProductDetails = () => {
           qty={`${product?.qty}${product?.unit}`}
           place={product?.place}
         />
+        <DownloadFile id={productId!} />
         {/* GOODSIssue AND GOODSReception */}
         <SupplyDetails
           goodsIssue={goodsIssue}
