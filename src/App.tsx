@@ -15,9 +15,14 @@ export const App = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/products" replace />} />
         <Route path="/products" element={<ProductsList />} />
-        <Route path="/goods" element={<GoodsList filter="goods" />} />
-        <Route path="/supply" element={<GoodsList filter="supply" />} />
-        {/*<Route path="/supply" element={<SupplyList />} />*/}
+        <Route
+          path="/goods-issue"
+          element={<GoodsList filter="all-goods-issue" />}
+        />
+        <Route
+          path="/goods-reception"
+          element={<GoodsList filter="all-goods-reception" />}
+        />
         <Route path="/details/:productId" element={<ProductDetails />} />
         <Route path="cart" element={<Cart />} />
         <Route path="*" element={<NotFoundView />} />

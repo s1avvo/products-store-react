@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
 import { Cart, OrderViewEntity } from "types";
 
-import { Box, Typography } from "@mui/material";
+import { Box, SelectChangeEvent } from "@mui/material";
 import { addToCart, setCartProduct } from "../../state/cartSlice";
 import {
   GridActionsCellItem,
@@ -13,8 +13,10 @@ import {
 
 import { AddCircleOutlineOutlined } from "@mui/icons-material";
 
-import { SupplyForm } from "../../components/SupplyForm";
-import { GoodsDataGrid } from "../../components/GoodsDataGrid";
+import { SupplyForm } from "../../components/Global/SupplyForm";
+import { GoodsDataGrid } from "../../components/GoodsList/GoodsDataGrid";
+import { TopBox } from "../../components/Global/TopBox";
+import { GoodsListMenu } from "../../components/GoodsList/GoodsListMenu";
 
 interface Props {
   filter: string;
@@ -24,11 +26,12 @@ export const GoodsList = (props: Props) => {
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart.cart);
 
+  const [range, setRange] = useState<string>("1");
   const [goodsList, setGoodsList] = useState<OrderViewEntity[]>([]);
   const [openAmount, setOpenAmount] = useState(false);
 
   async function getItems() {
-    const res = await fetch(`http://localhost:3001/${props.filter}`, {
+    const res = await fetch(`http://localhost:3001/${props.filter}/${range}`, {
       method: "GET",
     });
     setGoodsList(await res.json());
@@ -36,7 +39,13 @@ export const GoodsList = (props: Props) => {
 
   useEffect(() => {
     getItems();
-  }, [props.filter]);
+  }, [props.filter, range]);
+
+  /*RANGE*/
+
+  const handleRange = (event: SelectChangeEvent) => {
+    setRange(event.target.value);
+  };
 
   /*SET CART ITEM*/
 
@@ -55,10 +64,10 @@ export const GoodsList = (props: Props) => {
       sortable: false,
       filterable: false,
     },
-    { field: "amount", headerName: "Ilość wyd.", flex: 0.5, type: "number" },
+    { field: "amount", headerName: "Ilość", flex: 0.5, type: "number" },
     {
-      field: "data",
-      headerName: "Data wyd.",
+      field: "date",
+      headerName: "Data",
       flex: 0.8,
       type: "date",
       valueGetter: ({ value }) => value && new Date(value).toLocaleDateString(),
@@ -100,24 +109,15 @@ export const GoodsList = (props: Props) => {
         setCartItem={setCartItem}
       />
       <Box width="80%" margin="20px auto">
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          m="15px"
+        <TopBox
+          name={
+            props.filter === "all-goods-issue"
+              ? "Wydań produktów"
+              : "Przyjęć produktów"
+          }
         >
-          <Typography variant="h4">
-            {props.filter === "goods" ? (
-              <>
-                Lista <b>Wydań produktów</b>
-              </>
-            ) : (
-              <>
-                Lista <b>Przyjęć produktów</b>
-              </>
-            )}
-          </Typography>
-        </Box>
+          <GoodsListMenu handleRange={handleRange} />
+        </TopBox>
         <GoodsDataGrid rows={goodsList} columns={columns} />
       </Box>
     </>

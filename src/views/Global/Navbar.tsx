@@ -117,7 +117,7 @@ export const Navbar = () => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  navigate(`/goods`);
+                  navigate(`/goods-issue`);
                   setAnchorEl(null);
                 }}
               >
@@ -125,7 +125,7 @@ export const Navbar = () => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  navigate(`/supply`);
+                  navigate(`/goods-reception`);
                   setAnchorEl(null);
                 }}
               >

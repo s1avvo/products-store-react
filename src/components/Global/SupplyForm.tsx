@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../app/redux-hooks";
+import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 import { Cart } from "types";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { setGoodsIssueOrReception } from "../state/cartSlice";
+import { setGoodsIssueOrReception } from "../../state/cartSlice";
 
 const modalStyles = {
   wrapper: {

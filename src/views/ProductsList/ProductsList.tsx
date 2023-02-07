@@ -23,11 +23,11 @@ import {
   deleteProductFromList,
 } from "../../state/productListSlice";
 
-import { SupplyForm } from "../../components/SupplyForm";
-import { ProductsGoodsListMenu } from "./ProductsGoodsListMenu";
-import { AddOrEditProductForm } from "../../components/AddOrEditProductForm";
-import { TopBox } from "../../components/TopBox";
-import { ProductsDataGrid } from "../../components/ProductsDataGrid";
+import { SupplyForm } from "../../components/Global/SupplyForm";
+import { ProductsGoodsListMenu } from "../../components/ProductList/ProductsGoodsListMenu";
+import { AddOrEditProductForm } from "../../components/ProductList/AddOrEditProductForm";
+import { TopBox } from "../../components/Global/TopBox";
+import { ProductsDataGrid } from "../../components/ProductList/ProductsDataGrid";
 
 const defaultValue: CreateProductReq = {
   name: "",

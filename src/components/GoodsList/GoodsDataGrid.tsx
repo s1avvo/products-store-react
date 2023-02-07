@@ -32,7 +32,7 @@ export const GoodsDataGrid = ({ rows, columns }: Props) => {
       <DataGrid
         rows={rows}
         columns={columns}
-        getRowId={(row: OrderViewEntity) => row.idItem}
+        getRowId={(row) => row.idItem as string}
         components={{
           Toolbar: () => (
             <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
