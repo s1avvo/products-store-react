@@ -16,7 +16,7 @@ export const SupplyDetails = ({ goodsIssue, goodsReception }: Props) => {
 
   const columns: GridColDef[] = [
     {
-      field: "data",
+      field: "date",
       headerName: "Data",
       flex: 0.75,
       minWidth: 100,

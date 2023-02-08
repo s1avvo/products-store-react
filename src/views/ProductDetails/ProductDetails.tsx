@@ -9,6 +9,7 @@ import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDet
 import { GoodsEntity } from "types";
 import { Box, Paper, Typography } from "@mui/material";
 import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
+import { UploadFile } from "../../components/ProductDetails/UploadPanel";
 
 export const ProductDetails = () => {
   const { productId } = useParams();
@@ -17,6 +18,9 @@ export const ProductDetails = () => {
   );
   const [goodsIssue, setGoodsIssue] = useState<GoodsEntity[]>([]);
   const [goodsReception, setGoodsReception] = useState<GoodsEntity[]>([]);
+  const [isProductDataSheet, setIsProductDataSheet] = useState(
+    product?.productDataSheet
+  );
 
   async function getItem() {
     const res = await fetch(`http://localhost:3001/details/${productId}`, {
@@ -54,7 +58,14 @@ export const ProductDetails = () => {
           qty={`${product?.qty}${product?.unit}`}
           place={product?.place}
         />
-        <DownloadFile id={productId!} />
+        {isProductDataSheet === 0 ? (
+          <UploadFile
+            id={productId!}
+            productDataSheet={(d) => setIsProductDataSheet(d)}
+          />
+        ) : null}
+        {isProductDataSheet === 1 ? <DownloadFile id={productId!} /> : null}
+
         {/* GOODSIssue AND GOODSReception */}
         <SupplyDetails
           goodsIssue={goodsIssue}
