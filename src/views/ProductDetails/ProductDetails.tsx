@@ -1,38 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAppSelector } from "../../app/redux-hooks";
-import { selectSingleProduct } from "../../state/productListSlice";
 
 import { SupplyDetails } from "../../components/ProductDetails/SupplyDetails";
 import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDetailsHeader";
 
-import { GoodsEntity } from "types";
+import { GoodsEntity, ProductEntity } from "types";
 import { Box, Paper, Typography } from "@mui/material";
 import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
 import { UploadFile } from "../../components/ProductDetails/UploadPanel";
 
 export const ProductDetails = () => {
   const { productId } = useParams();
-  const product = useAppSelector((state) =>
-    selectSingleProduct(state, productId!)
-  );
+  const [product, setProduct] = useState<ProductEntity | null>(null);
   const [goodsIssue, setGoodsIssue] = useState<GoodsEntity[]>([]);
   const [goodsReception, setGoodsReception] = useState<GoodsEntity[]>([]);
   const [isProductDataSheet, setIsProductDataSheet] = useState(
     product?.productDataSheet
   );
 
-  async function getItem() {
-    const res = await fetch(`http://localhost:3001/details/${productId}`, {
-      method: "GET",
-    });
-    const item = await res.json();
-    setGoodsIssue(item.goodsIssue as GoodsEntity[]);
-    setGoodsReception(item.goodsReception as GoodsEntity[]);
-  }
-
   useEffect(() => {
-    getItem();
+    (async () => {
+      const resProduct = await fetch(
+        `http://localhost:3001/products/${productId}`
+      );
+      const product = await resProduct.json();
+      setProduct(product);
+
+      const resDetails = await fetch(
+        `http://localhost:3001/details/${productId}`,
+        {
+          method: "GET",
+        }
+      );
+      const details = await resDetails.json();
+      setGoodsIssue(details.goodsIssue as GoodsEntity[]);
+      setGoodsReception(details.goodsReception as GoodsEntity[]);
+    })();
   }, [productId]);
 
   return (
