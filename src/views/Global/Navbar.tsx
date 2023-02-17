@@ -69,9 +69,14 @@ export const Navbar = () => {
             columnGap="20px"
             zIndex="2"
           >
-            <IconButton sx={{ color: "black" }}>
-              <PersonOutline />
-            </IconButton>
+            <Tooltip title="Zaloguj">
+              <IconButton
+                sx={{ color: "black" }}
+                onClick={() => navigate(`/auth`)}
+              >
+                <PersonOutline />
+              </IconButton>
+            </Tooltip>
             <Badge
               badgeContent={cart.length}
               color="secondary"

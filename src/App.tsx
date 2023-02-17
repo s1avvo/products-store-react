@@ -7,6 +7,7 @@ import { ProductDetails } from "./views/ProductDetails/ProductDetails";
 import { NotFoundView } from "./views/NotFoundView";
 import { Navbar } from "./views/Global/Navbar";
 import { Cart } from "./views/Global/Cart";
+import { AuthForm } from "./views/Global/AuthForm";
 
 export const App = () => {
   return (
@@ -24,6 +25,7 @@ export const App = () => {
           element={<GoodsList filter="all-goods-reception" />}
         />
         <Route path="/details/:productId" element={<ProductDetails />} />
+        <Route path="/auth" element={<AuthForm />} />
         <Route path="cart" element={<Cart />} />
         <Route path="*" element={<NotFoundView />} />
       </Routes>
