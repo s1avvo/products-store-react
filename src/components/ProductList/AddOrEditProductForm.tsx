@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ProductEntity, CreateProductReq } from "types";
+import { ProductEntity, CreateProduct } from "types";
 import * as Yup from "yup";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -49,7 +49,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   addOrEditProduct: (data: ProductEntity) => void;
-  valueForm: CreateProductReq;
+  valueForm: CreateProduct;
 }
 
 const validationSchema = Yup.object().shape({
@@ -71,7 +71,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export const AddOrEditProductForm = (props: Props) => {
-  const [value, setValue] = useState<CreateProductReq>(props.valueForm);
+  const [value, setValue] = useState<CreateProduct>(props.valueForm);
 
   const {
     register,

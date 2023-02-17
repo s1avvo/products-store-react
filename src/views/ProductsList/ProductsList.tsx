@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
-import { CreateProductReq, ProductEntity, Cart } from "types";
+import { CreateProduct, ProductEntity } from "types";
 
 import { Box, Button } from "@mui/material";
 import {
@@ -14,7 +14,7 @@ import {
   EditOutlined,
 } from "@mui/icons-material";
 
-import { addToCart, setCartProduct } from "../../state/cartSlice";
+import { addToCart, Cart, setCartProduct } from "../../state/cartSlice";
 import {
   selectAllProducts,
   fetchProductsList,
@@ -29,11 +29,13 @@ import { AddOrEditProductForm } from "../../components/ProductList/AddOrEditProd
 import { TopBox } from "../../components/Global/TopBox";
 import { ProductsDataGrid } from "../../components/ProductList/ProductsDataGrid";
 
-const defaultValue: CreateProductReq = {
+const defaultValue: CreateProduct = {
   name: "",
   secondName: "",
   unit: "",
   place: "",
+  productDataSheet: 0,
+  active: 1,
 };
 
 export const ProductsList = () => {
@@ -67,7 +69,7 @@ export const ProductsList = () => {
 
   /*POST ACTION*/
 
-  const handleAddProduct = async (product: CreateProductReq) => {
+  const handleAddProduct = async (product: CreateProduct) => {
     await dispatch(addProductToList(product))
       .unwrap()
       .catch((err) => console.log(err.message));
@@ -77,8 +79,10 @@ export const ProductsList = () => {
 
   /*PUT ACTION*/
 
-  const handleUpdateProduct = async (product: ProductEntity) => {
-    await dispatch(updateProductOnList({ id: valueEditForm!.id, ...product }))
+  const handleUpdateProduct = async (product: CreateProduct) => {
+    await dispatch(
+      updateProductOnList({ id: valueEditForm?.id as string, ...product })
+    )
       .unwrap()
       .catch((err) => console.log(err.message));
 
@@ -177,7 +181,7 @@ export const ProductsList = () => {
           open={openEditForm}
           onClose={() => setOpenEditForm(false)}
           addOrEditProduct={handleUpdateProduct}
-          valueForm={valueEditForm as CreateProductReq}
+          valueForm={valueEditForm as CreateProduct}
         />
       )}
       <AddOrEditProductForm

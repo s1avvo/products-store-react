@@ -8,10 +8,9 @@ import {
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
-import { OrderViewEntity } from "types";
 
 interface Props {
-  rows: OrderViewEntity[];
+  rows: any[];
   columns: GridColDef[];
 }
 

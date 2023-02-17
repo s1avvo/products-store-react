@@ -1,10 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  ProductEntity,
-  QtyUpdate,
-  CreateProductReq,
-  UpdateProductReq,
-} from "types";
+import { ProductEntity, QtyUpdate, CreateProduct, UpdateProduct } from "types";
 import { RootState } from "../app/store";
 
 interface ProductsListState {
@@ -33,7 +28,7 @@ export const fetchProductsList = createAsyncThunk(
 
 export const addProductToList = createAsyncThunk(
   "productsList/addProductToList",
-  async (product: CreateProductReq, { rejectWithValue }) => {
+  async (product: CreateProduct, { rejectWithValue }) => {
     try {
       const response = await fetch("http://localhost:3001/store/add", {
         method: "POST",
@@ -51,7 +46,7 @@ export const addProductToList = createAsyncThunk(
 
 export const updateProductOnList = createAsyncThunk(
   "productsList/updateProductOnList",
-  async (product: UpdateProductReq, { rejectWithValue }) => {
+  async (product: UpdateProduct, { rejectWithValue }) => {
     try {
       const response = await fetch("http://localhost:3001/store/update", {
         method: "PUT",

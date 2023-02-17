@@ -1,5 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Cart, ProductEntity } from "types";
+import { ProductEntity } from "types";
+
+export enum PERSONS {
+  knadolna = "Katarzyna Nadolna",
+  dolender = "Dorota Olender",
+  apawelczyk = "Anna Pawełczyk",
+  ksowa = "Katarzyna Sowa",
+  bcwynar = "Barbara Cwynar",
+  jzwawik = "Justyna Żwawiak",
+  mbednard = "Marek Bernard",
+  jwargula = "Joanna Warguła",
+}
+
+export interface Cart {
+  name: string;
+  amount: number;
+  person: PERSONS;
+  productId: string;
+}
 
 interface CartState {
   isCartOpen: boolean;

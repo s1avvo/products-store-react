@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
-import { Cart } from "types";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { setGoodsIssueOrReception } from "../../state/cartSlice";
+import { Cart, PERSONS, setGoodsIssueOrReception } from "../../state/cartSlice";
 
 const modalStyles = {
   wrapper: {
@@ -44,17 +43,6 @@ const modalStyles = {
     gap: "10px",
   },
 };
-
-enum PERSONS {
-  knadolna = "Katarzyna Nadolna",
-  dolender = "Dorota Olender",
-  apawelczyk = "Anna Pawełczyk",
-  ksowa = "Katarzyna Sowa",
-  bcwynar = "Barbara Cwynar",
-  jzwawik = "Justyna Żwawiak",
-  mbednard = "Marek Bernard",
-  jwargula = "Joanna Warguła",
-}
 
 interface Props {
   open: boolean;
@@ -167,7 +155,7 @@ export const SupplyForm = (props: Props) => {
               onChange={(event) =>
                 setValue((prevState) => ({
                   ...prevState,
-                  person: event.target.value,
+                  person: event.target.value as PERSONS,
                 }))
               }
             >

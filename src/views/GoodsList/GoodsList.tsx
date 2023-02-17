@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
-import { Cart, OrderViewEntity } from "types";
-
 import { Box, SelectChangeEvent } from "@mui/material";
-import { addToCart, setCartProduct } from "../../state/cartSlice";
+import { addToCart, Cart, setCartProduct } from "../../state/cartSlice";
 import {
   GridActionsCellItem,
   GridColDef,
@@ -27,7 +25,7 @@ export const GoodsList = (props: Props) => {
   const cart = useAppSelector((state) => state.cart.cart);
 
   const [range, setRange] = useState<string>("1");
-  const [goodsList, setGoodsList] = useState<OrderViewEntity[]>([]);
+  const [goodsList, setGoodsList] = useState<any[]>([]);
   const [openAmount, setOpenAmount] = useState(false);
 
   async function getItems() {
