@@ -70,6 +70,30 @@ export const updateProductOnList = createAsyncThunk(
   }
 );
 
+export const updateProductDataSheet = createAsyncThunk(
+  "productsList/updateProductDataSheet",
+  async (
+    data: { id: string; token: string; file: FormData },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/store/upload/${data.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+          body: data.file,
+        }
+      );
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
 export const deleteProductFromList = createAsyncThunk(
   "productsList/deleteProductFromList",
   async (data: { id: string; token: string }, { rejectWithValue }) => {
@@ -128,6 +152,13 @@ export const productListSlice = createSlice({
       .addCase(deleteProductFromList.fulfilled, (state, action) => {
         state.productsList.filter((item) => item.id !== action.meta.arg.id);
         state.status = "idle";
+      })
+      .addCase(updateProductDataSheet.fulfilled, (state, action) => {
+        state.productsList.map((item) =>
+          item.id === action.meta.arg.id
+            ? { ...item, productDataSheet: 1 }
+            : item
+        );
       });
   },
 });

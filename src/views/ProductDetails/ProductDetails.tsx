@@ -7,16 +7,13 @@ import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDet
 import { GoodsEntity, ProductEntity } from "types";
 import { Box, Paper, Typography } from "@mui/material";
 import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
-import { UploadFile } from "../../components/ProductDetails/UploadPanel";
 
 export const ProductDetails = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState<ProductEntity | null>(null);
   const [goodsIssue, setGoodsIssue] = useState<GoodsEntity[]>([]);
   const [goodsReception, setGoodsReception] = useState<GoodsEntity[]>([]);
-  const [isProductDataSheet, setIsProductDataSheet] = useState(
-    product?.productDataSheet
-  );
+  const [isProductDataSheet, setIsProductDataSheet] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -25,6 +22,7 @@ export const ProductDetails = () => {
       );
       const product = await resProduct.json();
       setProduct(product);
+      setIsProductDataSheet(product.productDataSheet === 1);
 
       const resDetails = await fetch(
         `http://localhost:3001/details/${productId}`,
@@ -61,13 +59,8 @@ export const ProductDetails = () => {
           qty={`${product?.qty}${product?.unit}`}
           place={product?.place}
         />
-        {isProductDataSheet === 0 ? (
-          <UploadFile
-            id={productId!}
-            productDataSheet={(d) => setIsProductDataSheet(d)}
-          />
-        ) : null}
-        {isProductDataSheet === 1 ? <DownloadFile id={productId!} /> : null}
+        {/* PRODUCT DATA SHEET .PDF */}
+        {isProductDataSheet ? <DownloadFile id={productId!} /> : null}
 
         {/* GOODSIssue AND GOODSReception */}
         <SupplyDetails

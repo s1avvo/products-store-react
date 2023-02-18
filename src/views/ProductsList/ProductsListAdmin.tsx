@@ -21,6 +21,7 @@ import {
   addProductToList,
   updateProductOnList,
   deleteProductFromList,
+  updateProductDataSheet,
 } from "../../state/productListSlice";
 
 import { SupplyForm } from "../../components/Global/SupplyForm";
@@ -72,18 +73,34 @@ export const ProductsListAdmin = () => {
 
   /*POST ACTION*/
 
-  const handleAddProduct = async (product: CreateProduct) => {
-    await dispatch(addProductToList({ product, token }))
+  const handleAddProduct = async (
+    product: CreateProduct,
+    dataSheet: File | null
+  ) => {
+    const newProduct = await dispatch(addProductToList({ product, token }))
       .unwrap()
       .catch((err) => console.log(err.message));
 
     setOpenAddForm(false);
+
+    if (!dataSheet) return;
+    const uploadedFile = new FormData();
+    uploadedFile.append("uploaded", dataSheet, `${newProduct.id}.pdf`);
+
+    await dispatch(
+      updateProductDataSheet({ id: newProduct.id, token, file: uploadedFile })
+    )
+      .unwrap()
+      .catch((err) => console.log(err.message));
   };
 
   /*PUT ACTION*/
 
-  const handleUpdateProduct = async (product: CreateProduct) => {
-    await dispatch(
+  const handleUpdateProduct = async (
+    product: CreateProduct,
+    dataSheet: File | null
+  ) => {
+    const newProduct = await dispatch(
       updateProductOnList({
         product: { id: valueEditForm?.id as string, ...product },
         token,
@@ -93,6 +110,16 @@ export const ProductsListAdmin = () => {
       .catch((err) => console.log(err.message));
 
     setOpenEditForm(false);
+
+    if (!dataSheet) return;
+    const uploadedFile = new FormData();
+    uploadedFile.append("uploaded", dataSheet, `${newProduct.id}.pdf`);
+
+    await dispatch(
+      updateProductDataSheet({ id: newProduct.id, token, file: uploadedFile })
+    )
+      .unwrap()
+      .catch((err) => console.log(err.message));
   };
 
   /*SET CART ITEM*/

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ProductEntity, CreateProduct } from "types";
 import * as Yup from "yup";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -8,11 +8,16 @@ import {
   Box,
   Button,
   Divider,
+  FormControl,
+  FormControlLabel,
   MenuItem,
   Modal,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material";
+import { EditOutlined } from "@mui/icons-material";
+import { useDropzone } from "react-dropzone";
 
 const modalStyles = {
   wrapper: {
@@ -48,7 +53,7 @@ interface Props {
   name: string;
   open: boolean;
   onClose: () => void;
-  addOrEditProduct: (data: ProductEntity) => void;
+  addOrEditProduct: (data: ProductEntity, dataSheet: File | null) => void;
   valueForm: CreateProduct;
 }
 
@@ -72,6 +77,13 @@ const validationSchema = Yup.object().shape({
 
 export const AddOrEditProductForm = (props: Props) => {
   const [value, setValue] = useState<CreateProduct>(props.valueForm);
+  const [file, setFile] = useState<File | null>(null);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    setFile(acceptedFiles[0]);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   const {
     register,
@@ -80,7 +92,7 @@ export const AddOrEditProductForm = (props: Props) => {
   } = useForm({ resolver: yupResolver(validationSchema), mode: "all" });
 
   const addOrEditProduct: SubmitHandler<FieldValues> = (data) => {
-    props.addOrEditProduct(data as ProductEntity);
+    props.addOrEditProduct(data as ProductEntity, file);
   };
 
   useEffect(() => {
@@ -164,6 +176,49 @@ export const AddOrEditProductForm = (props: Props) => {
               }))
             }
           />
+          <Box
+            gridColumn="span 4"
+            border={`1px solid grey`}
+            borderRadius="5px"
+            p="1rem"
+          >
+            <div {...getRootProps()}>
+              <input {...getInputProps()} />
+              {!file ? (
+                isDragActive ? (
+                  <Typography>Możesz puścić plik</Typography>
+                ) : (
+                  <Typography>Przeciągnij plik lub kliknij</Typography>
+                )
+              ) : (
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography>{file?.name}</Typography>
+                  <EditOutlined />
+                </Box>
+              )}
+            </div>
+          </Box>
+          <FormControl variant="standard" component="fieldset">
+            <FormControlLabel
+              control={
+                <Switch
+                  {...register("active")}
+                  checked={!!value.active}
+                  onChange={(event) =>
+                    setValue((prevState) => ({
+                      ...prevState,
+                      active: event.target.checked ? 1 : 0,
+                    }))
+                  }
+                />
+              }
+              label="Wł./Wył. produkt"
+            />
+          </FormControl>
         </Box>
         <Box sx={modalStyles.buttons}>
           <Button variant="contained" type="submit">
