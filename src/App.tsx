@@ -1,31 +1,29 @@
 import React from "react";
 
 import { Route, Routes, Navigate } from "react-router-dom";
-import { ProductsList } from "./views/ProductsList/ProductsList";
-import { GoodsList } from "./views/GoodsList/GoodsList";
+import { ProductsListAdmin } from "./views/ProductsList/ProductsListAdmin";
 import { ProductDetails } from "./views/ProductDetails/ProductDetails";
 import { NotFoundView } from "./views/NotFoundView";
 import { Navbar } from "./views/Global/Navbar";
 import { Cart } from "./views/Global/Cart";
 import { AuthForm } from "./views/Global/AuthForm";
+import { useAppSelector } from "./app/redux-hooks";
+import { ProductsListUsers } from "./views/ProductsList/ProductsListUsers";
 
 export const App = () => {
+  const isAuth = Boolean(useAppSelector((state) => state.auth.token));
   return (
     <div className="app">
       <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/products" replace />} />
-        <Route path="/products" element={<ProductsList />} />
-        <Route
-          path="/goods-issue"
-          element={<GoodsList filter="all-goods-issue" />}
-        />
-        <Route
-          path="/goods-reception"
-          element={<GoodsList filter="all-goods-reception" />}
-        />
+        <Route path="/" element={<Navigate to="/products-users" replace />} />
+        <Route path="/products-users" element={<ProductsListUsers />} />
         <Route path="/details/:productId" element={<ProductDetails />} />
         <Route path="/auth" element={<AuthForm />} />
+        <Route
+          path="/products-admin"
+          element={isAuth ? <ProductsListAdmin /> : <Navigate to="/" />}
+        />
         <Route path="cart" element={<Cart />} />
         <Route path="*" element={<NotFoundView />} />
       </Routes>

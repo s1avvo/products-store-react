@@ -42,15 +42,17 @@ export const AuthForm = () => {
     }
 
     const loggedIn = await res.json();
+
+    console.log(loggedIn);
     onSubmitProps.resetForm();
     if (loggedIn) {
       dispatch(
         setLogin({
-          user: loggedIn.user,
+          user: loggedIn.userName,
           token: loggedIn.token,
         })
       );
-      navigate("/products");
+      navigate("/products-admin");
     }
   };
 

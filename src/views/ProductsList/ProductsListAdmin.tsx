@@ -38,7 +38,7 @@ const defaultValue: CreateProduct = {
   active: 1,
 };
 
-export const ProductsList = () => {
+export const ProductsListAdmin = () => {
   const dispatch = useAppDispatch();
 
   const products = useAppSelector(selectAllProducts);
