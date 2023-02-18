@@ -33,6 +33,7 @@ const FlexBox = styled(Box)`
 
 export const Cart = () => {
   const dispatch = useAppDispatch();
+  const token = useAppSelector((state) => state.auth.token);
   const cart = useAppSelector((state) => state.cart.cart);
   const cartType = useAppSelector((state) => state.cart.goodsIssueOrReception);
   const isCartOpen = useAppSelector((state) => state.cart.isCartOpen);
@@ -56,6 +57,7 @@ export const Cart = () => {
           {
             method: "POST",
             headers: {
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -86,6 +88,7 @@ export const Cart = () => {
           {
             method: "POST",
             headers: {
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({

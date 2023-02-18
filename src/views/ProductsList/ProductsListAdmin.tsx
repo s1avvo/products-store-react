@@ -41,6 +41,7 @@ const defaultValue: CreateProduct = {
 export const ProductsListAdmin = () => {
   const dispatch = useAppDispatch();
 
+  const token = useAppSelector((state) => state.auth.token);
   const products = useAppSelector(selectAllProducts);
   const postStatus = useAppSelector((state) => state.productList.status);
   const cart = useAppSelector((state) => state.cart.cart);
@@ -52,6 +53,8 @@ export const ProductsListAdmin = () => {
     null
   );
   const [openAddForm, setOpenAddForm] = useState(false);
+
+  if (!token) throw new Error("Brak autoryzacji");
 
   /*FILTER*/
 
@@ -70,7 +73,7 @@ export const ProductsListAdmin = () => {
   /*POST ACTION*/
 
   const handleAddProduct = async (product: CreateProduct) => {
-    await dispatch(addProductToList(product))
+    await dispatch(addProductToList({ product, token }))
       .unwrap()
       .catch((err) => console.log(err.message));
 
@@ -81,7 +84,10 @@ export const ProductsListAdmin = () => {
 
   const handleUpdateProduct = async (product: CreateProduct) => {
     await dispatch(
-      updateProductOnList({ id: valueEditForm?.id as string, ...product })
+      updateProductOnList({
+        product: { id: valueEditForm?.id as string, ...product },
+        token,
+      })
     )
       .unwrap()
       .catch((err) => console.log(err.message));
@@ -164,7 +170,9 @@ export const ProductsListAdmin = () => {
             icon={<DeleteOutlined />}
             label="Delete"
             onClick={() =>
-              dispatch(deleteProductFromList(cellValues.id as string))
+              dispatch(
+                deleteProductFromList({ id: cellValues.id as string, token })
+              )
             }
             color="inherit"
           />,

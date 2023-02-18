@@ -28,14 +28,18 @@ export const fetchProductsList = createAsyncThunk(
 
 export const addProductToList = createAsyncThunk(
   "productsList/addProductToList",
-  async (product: CreateProduct, { rejectWithValue }) => {
+  async (
+    data: { product: CreateProduct; token: string },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await fetch("http://localhost:3001/store/add", {
         method: "POST",
         headers: {
+          Authorization: `Bearer ${data.token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(product),
+        body: JSON.stringify(data.product),
       });
       return await response.json();
     } catch (err) {
@@ -46,14 +50,18 @@ export const addProductToList = createAsyncThunk(
 
 export const updateProductOnList = createAsyncThunk(
   "productsList/updateProductOnList",
-  async (product: UpdateProduct, { rejectWithValue }) => {
+  async (
+    data: { product: UpdateProduct; token: string },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await fetch("http://localhost:3001/store/update", {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${data.token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(product),
+        body: JSON.stringify(data.product),
       });
       return await response.json();
     } catch (err) {
@@ -64,14 +72,15 @@ export const updateProductOnList = createAsyncThunk(
 
 export const deleteProductFromList = createAsyncThunk(
   "productsList/deleteProductFromList",
-  async (id: string, { rejectWithValue }) => {
+  async (data: { id: string; token: string }, { rejectWithValue }) => {
     try {
       await fetch("http://localhost:3001/store/delete", {
         method: "DELETE",
         headers: {
+          Authorization: `Bearer ${data.token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id: data.id }),
       });
     } catch (err) {
       return rejectWithValue(err);
@@ -112,12 +121,12 @@ export const productListSlice = createSlice({
       })
       .addCase(updateProductOnList.fulfilled, (state, action) => {
         state.productsList.map((item) =>
-          item.id === action.meta.arg.id ? { ...action.meta.arg } : item
+          item.id === action.meta.arg.product.id ? { ...action.meta.arg } : item
         );
         state.status = "idle";
       })
       .addCase(deleteProductFromList.fulfilled, (state, action) => {
-        state.productsList.filter((item) => item.id !== action.meta.arg);
+        state.productsList.filter((item) => item.id !== action.meta.arg.id);
         state.status = "idle";
       });
   },
