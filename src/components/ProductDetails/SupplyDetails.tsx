@@ -21,7 +21,7 @@ export const SupplyDetails = ({ goodsIssue, goodsReception }: Props) => {
       flex: 0.75,
       minWidth: 100,
       type: "date",
-      valueGetter: ({ value }) => value && new Date(value).toLocaleDateString(),
+      valueGetter: ({ value }) => value && value.slice(0, -5).replace("T", " "),
     },
     { field: "amount", headerName: "Ilość", flex: 0.75, type: "number" },
     { field: "person", headerName: "Osoba", flex: 2 },

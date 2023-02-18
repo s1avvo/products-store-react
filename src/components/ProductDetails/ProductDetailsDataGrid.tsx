@@ -38,7 +38,7 @@ export const ProductDetailsDataGrid = ({ rows, columns }: Props) => {
       onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
       rowsPerPageOptions={[10, 25, 50]}
       initialState={{
-        sorting: { sortModel: [{ field: "data", sort: "asc" }] },
+        sorting: { sortModel: [{ field: "date", sort: "desc" }] },
       }}
     />
   );
