@@ -10,13 +10,14 @@ import {
   Divider,
   FormControl,
   FormControlLabel,
+  IconButton,
   MenuItem,
   Modal,
   Switch,
   TextField,
   Typography,
 } from "@mui/material";
-import { EditOutlined } from "@mui/icons-material";
+import { EditOutlined, DeleteOutlined } from "@mui/icons-material";
 import { useDropzone } from "react-dropzone";
 
 const modalStyles = {
@@ -93,6 +94,7 @@ export const AddOrEditProductForm = (props: Props) => {
 
   const addOrEditProduct: SubmitHandler<FieldValues> = (data) => {
     props.addOrEditProduct(data as ProductEntity, file);
+    setFile(null);
   };
 
   useEffect(() => {
@@ -177,30 +179,39 @@ export const AddOrEditProductForm = (props: Props) => {
             }
           />
           <Box
-            gridColumn="span 4"
-            border={`1px solid grey`}
-            borderRadius="5px"
-            p="1rem"
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
           >
-            <div {...getRootProps()}>
-              <input {...getInputProps()} />
-              {!file ? (
-                isDragActive ? (
-                  <Typography>Możesz puścić plik</Typography>
+            <Box
+              border={`1px dashed lightgrey`}
+              borderRadius="5px"
+              p="1rem"
+              width="100%"
+            >
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                {!file ? (
+                  isDragActive ? (
+                    <Typography>Możesz puścić plik</Typography>
+                  ) : (
+                    <Typography>Przeciągnij plik lub kliknij</Typography>
+                  )
                 ) : (
-                  <Typography>Przeciągnij plik lub kliknij</Typography>
-                )
-              ) : (
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography>{file?.name}</Typography>
-                  <EditOutlined />
-                </Box>
-              )}
-            </div>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Typography>{file?.name}</Typography>
+                    <EditOutlined />
+                  </Box>
+                )}
+              </div>
+            </Box>
+            <IconButton color="primary" onClick={() => setFile(null)}>
+              <DeleteOutlined />
+            </IconButton>
           </Box>
           <FormControl variant="standard" component="fieldset">
             <FormControlLabel
