@@ -122,6 +122,11 @@ export const ProductsListAdmin = () => {
       .catch((err) => console.log(err.message));
   };
 
+  const handleEditFormValue = (value: ProductEntity) => {
+    setValueEditForm(value);
+    setOpenEditForm(true);
+  };
+
   /*SET CART ITEM*/
 
   const setCartItem = (cartItem: Cart) => {
@@ -186,10 +191,7 @@ export const ProductsListAdmin = () => {
             key={`${cellValues.id}-edit`}
             icon={<EditOutlined />}
             label="Edit"
-            onClick={() => {
-              setValueEditForm(cellValues.row);
-              setOpenEditForm(true);
-            }}
+            onClick={() => handleEditFormValue(cellValues.row)}
             color="inherit"
           />,
           <GridActionsCellItem

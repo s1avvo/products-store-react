@@ -189,25 +189,29 @@ export const AddOrEditProductForm = (props: Props) => {
               p="1rem"
               width="100%"
             >
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                {!file ? (
-                  isDragActive ? (
-                    <Typography>Możesz puścić plik</Typography>
+              {value.productDataSheet !== 1 ? (
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  {!file ? (
+                    isDragActive ? (
+                      <Typography>Możesz puścić plik</Typography>
+                    ) : (
+                      <Typography>Dodaj kartę charakterystyki</Typography>
+                    )
                   ) : (
-                    <Typography>Przeciągnij plik lub kliknij</Typography>
-                  )
-                ) : (
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Typography>{file?.name}</Typography>
-                    <EditOutlined />
-                  </Box>
-                )}
-              </div>
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Typography>{file?.name}</Typography>
+                      <EditOutlined />
+                    </Box>
+                  )}
+                </div>
+              ) : (
+                <Typography>Karta została już dodana</Typography>
+              )}
             </Box>
             <IconButton color="primary" onClick={() => setFile(null)}>
               <DeleteOutlined />
