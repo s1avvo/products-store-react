@@ -9,9 +9,14 @@ import { GridColDef } from "@mui/x-data-grid";
 interface Props {
   goodsIssue: GoodsEntity[];
   goodsReception: GoodsEntity[];
+  isLoading: boolean;
 }
 
-export const SupplyDetails = ({ goodsIssue, goodsReception }: Props) => {
+export const SupplyDetails = ({
+  goodsIssue,
+  goodsReception,
+  isLoading,
+}: Props) => {
   const [value, setValue] = useState("goods");
 
   const columns: GridColDef[] = [
@@ -44,14 +49,18 @@ export const SupplyDetails = ({ goodsIssue, goodsReception }: Props) => {
         </Tabs>
       </Box>
       <TabPanel index="goods" value={value}>
-        {goodsIssue.length !== 0 && (
-          <ProductDetailsDataGrid rows={goodsIssue} columns={columns} />
-        )}
+        <ProductDetailsDataGrid
+          rows={goodsIssue}
+          columns={columns}
+          isLoading={isLoading}
+        />
       </TabPanel>
       <TabPanel index={"orders"} value={value}>
-        {goodsReception.length !== 0 && (
-          <ProductDetailsDataGrid rows={goodsReception} columns={columns} />
-        )}
+        <ProductDetailsDataGrid
+          rows={goodsReception}
+          columns={columns}
+          isLoading={isLoading}
+        />
       </TabPanel>
     </Box>
   );

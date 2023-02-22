@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProductEntity, QtyUpdate, CreateProduct, UpdateProduct } from "types";
+import { ProductEntity, QtyUpdate, CreateProduct } from "types";
 import { RootState } from "../app/store";
 
 interface ProductsListState {
@@ -51,7 +51,7 @@ export const addProductToList = createAsyncThunk(
 export const updateProductOnList = createAsyncThunk(
   "productsList/updateProductOnList",
   async (
-    data: { product: UpdateProduct; token: string },
+    data: { product: CreateProduct; token: string },
     { rejectWithValue }
   ) => {
     try {

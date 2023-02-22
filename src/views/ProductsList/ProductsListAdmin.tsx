@@ -26,18 +26,12 @@ import {
 
 import { SupplyForm } from "../../components/Global/SupplyForm";
 import { ProductsGoodsListMenu } from "../../components/ProductList/ProductsGoodsListMenu";
-import { AddOrEditProductForm } from "../../components/ProductList/AddOrEditProductForm";
+import {
+  AddOrEditProductForm,
+  defaultValue,
+} from "../../components/ProductList/AddOrEditProductForm";
 import { TopBox } from "../../components/Global/TopBox";
 import { ProductsDataGrid } from "../../components/ProductList/ProductsDataGrid";
-
-const defaultValue: CreateProduct = {
-  name: "",
-  secondName: "",
-  unit: "",
-  place: "",
-  productDataSheet: 0,
-  active: 1,
-};
 
 export const ProductsListAdmin = () => {
   const dispatch = useAppDispatch();
@@ -50,7 +44,7 @@ export const ProductsListAdmin = () => {
   const [filter, setFilter] = useState("products");
   const [openAmountForm, setOpenAmountForm] = useState(false);
   const [openEditForm, setOpenEditForm] = useState(false);
-  const [valueEditForm, setValueEditForm] = useState<ProductEntity | null>(
+  const [valueEditForm, setValueEditForm] = useState<CreateProduct | null>(
     null
   );
   const [openAddForm, setOpenAddForm] = useState(false);
@@ -69,6 +63,21 @@ export const ProductsListAdmin = () => {
     await dispatch(fetchProductsList(filter!))
       .unwrap()
       .catch((err) => console.log(err.message));
+  };
+
+  const handleEditFormValue = (product: ProductEntity) => {
+    const { id, name, secondName, unit, place, productDataSheet, active } =
+      product;
+    setValueEditForm({
+      id,
+      name,
+      secondName,
+      unit,
+      place,
+      productDataSheet,
+      active,
+    });
+    setOpenEditForm(true);
   };
 
   /*POST ACTION*/
@@ -94,18 +103,13 @@ export const ProductsListAdmin = () => {
       .catch((err) => console.log(err.message));
   };
 
-  /*PUT ACTION*/
+  // /*PUT ACTION*/
 
   const handleUpdateProduct = async (
     product: CreateProduct,
     dataSheet: File | null
   ) => {
-    const newProduct = await dispatch(
-      updateProductOnList({
-        product: { id: valueEditForm?.id as string, ...product },
-        token,
-      })
-    )
+    const newProduct = await dispatch(updateProductOnList({ product, token }))
       .unwrap()
       .catch((err) => console.log(err.message));
 
@@ -120,11 +124,6 @@ export const ProductsListAdmin = () => {
     )
       .unwrap()
       .catch((err) => console.log(err.message));
-  };
-
-  const handleEditFormValue = (value: ProductEntity) => {
-    setValueEditForm(value);
-    setOpenEditForm(true);
   };
 
   /*SET CART ITEM*/
@@ -214,15 +213,13 @@ export const ProductsListAdmin = () => {
     <>
       {valueEditForm && (
         <AddOrEditProductForm
-          name="Edytuj product:"
           open={openEditForm}
           onClose={() => setOpenEditForm(false)}
           addOrEditProduct={handleUpdateProduct}
-          valueForm={valueEditForm as CreateProduct}
+          valueForm={valueEditForm}
         />
       )}
       <AddOrEditProductForm
-        name="Dodaj product:"
         open={openAddForm}
         onClose={() => setOpenAddForm(false)}
         addOrEditProduct={handleAddProduct}

@@ -1,60 +1,52 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ProductEntity, CreateProduct } from "types";
+import { CreateProduct } from "types";
 import * as Yup from "yup";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 
 import {
   Box,
   Button,
-  Divider,
   FormControl,
   FormControlLabel,
   IconButton,
   MenuItem,
   Modal,
+  Paper,
   Switch,
   TextField,
   Typography,
 } from "@mui/material";
 import { EditOutlined, DeleteOutlined } from "@mui/icons-material";
 import { useDropzone } from "react-dropzone";
-
-const modalStyles = {
-  wrapper: {
-    position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "max(500px, 30%)",
-    backgroundColor: "white",
-    p: 4,
-    zIndex: 10,
-  },
-  inputFields: {
-    display: "flex",
-    flexDirection: "column",
-    marginTop: "20px",
-    marginBottom: "15px",
-    gap: "20px",
-  },
-  buttons: {
-    display: "flex",
-    justifyContent: "end",
-    gap: "10px",
-  },
-};
+import { Formik, FormikHelpers } from "formik";
 
 enum Units {
   l = "l",
   kg = "kg",
 }
 
+export interface DataSheetInterface {
+  file: File | null;
+  productDataSheet: number;
+}
+
+export const defaultValueDataSheet: DataSheetInterface = {
+  file: null,
+  productDataSheet: 0,
+};
+
+export const defaultValue: Omit<CreateProduct, "createdAt"> = {
+  name: "",
+  secondName: "",
+  unit: "",
+  place: "",
+  productDataSheet: 0,
+  active: 1,
+};
+
 interface Props {
-  name: string;
   open: boolean;
   onClose: () => void;
-  addOrEditProduct: (data: ProductEntity, dataSheet: File | null) => void;
+  addOrEditProduct: (data: CreateProduct, dataSheet: File | null) => void;
   valueForm: CreateProduct;
 }
 
@@ -77,171 +69,190 @@ const validationSchema = Yup.object().shape({
 });
 
 export const AddOrEditProductForm = (props: Props) => {
-  const [value, setValue] = useState<CreateProduct>(props.valueForm);
-  const [file, setFile] = useState<File | null>(null);
+  const [initialValues, setInitialValues] = useState(props.valueForm);
+  const [file, setFile] = useState(defaultValueDataSheet);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFile(acceptedFiles[0]);
+    setFile({ file: acceptedFiles[0], productDataSheet: 1 });
   }, []);
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ resolver: yupResolver(validationSchema), mode: "all" });
-
-  const addOrEditProduct: SubmitHandler<FieldValues> = (data) => {
-    props.addOrEditProduct(data as ProductEntity, file);
-    setFile(null);
+  const handleProductForm = async (
+    values: CreateProduct,
+    onSubmitProps: FormikHelpers<CreateProduct>
+  ) => {
+    !initialValues.id
+      ? props.addOrEditProduct(
+          {
+            ...values,
+            productDataSheet: file.productDataSheet,
+          } as CreateProduct,
+          file.file
+        )
+      : props.addOrEditProduct(
+          {
+            ...values,
+            productDataSheet: file.productDataSheet,
+            id: initialValues.id,
+          } as CreateProduct,
+          file.file
+        );
+    setFile(defaultValueDataSheet);
+    onSubmitProps.resetForm();
   };
 
   useEffect(() => {
-    setValue(props.valueForm);
-  }, [props.open, props.valueForm]);
+    setInitialValues(props.valueForm);
+  }, [props.valueForm]);
 
   return (
     <Modal
       open={props.open}
       onClose={props.onClose}
-      aria-labelledby="modal-title"
+      aria-labelledby="product-form"
     >
-      <Box
-        sx={modalStyles.wrapper}
-        component="form"
-        onSubmit={handleSubmit(addOrEditProduct)}
+      <Paper
+        sx={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "max(400px, 30%)",
+          margin: "0 auto",
+          padding: "20px",
+          gap: "20px",
+        }}
       >
-        <Typography id="modal-modal-title" variant="subtitle1">
-          {props.name}
-        </Typography>
-        <Divider />
-        <Box sx={modalStyles.inputFields}>
-          <TextField
-            placeholder="Nazwa"
-            label="Nazwa"
-            required
-            {...register("name")}
-            error={!!errors.name}
-            helperText={errors.name?.message as string}
-            value={value.name}
-            onChange={(event) =>
-              setValue((prevState) => ({
-                ...prevState,
-                name: event.target.value,
-              }))
-            }
-          />
-          <TextField
-            placeholder="Druga nazwa"
-            label="Druga nazwa"
-            {...register("secondName")}
-            error={!!errors.secondName}
-            helperText={errors.secondName?.message as string}
-            value={value.secondName}
-            onChange={(event) =>
-              setValue((prevState) => ({
-                ...prevState,
-                secondName: event.target.value,
-              }))
-            }
-          />
-          <TextField
-            label="j.m."
-            {...register("unit")}
-            value={value.unit}
-            select
-            error={!!errors.unit}
-            helperText={errors.unit?.message as string}
-            onChange={(event) =>
-              setValue((prevState) => ({
-                ...prevState,
-                unit: event.target.value,
-              }))
-            }
-          >
-            <MenuItem value={Units.l}>l</MenuItem>
-            <MenuItem value={Units.kg}>kg</MenuItem>
-          </TextField>
-          <TextField
-            placeholder="Miejsce"
-            label="Miejsce"
-            required
-            {...register("place")}
-            error={!!errors.place}
-            helperText={errors.place?.message as string}
-            value={value.place}
-            onChange={(event) =>
-              setValue((prevState) => ({
-                ...prevState,
-                place: event.target.value,
-              }))
-            }
-          />
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Box
-              border={`1px dashed lightgrey`}
-              borderRadius="5px"
-              p="1rem"
-              width="100%"
-            >
-              {value.productDataSheet !== 1 ? (
-                <div {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  {!file ? (
-                    isDragActive ? (
-                      <Typography>Możesz puścić plik</Typography>
-                    ) : (
-                      <Typography>Dodaj kartę charakterystyki</Typography>
-                    )
-                  ) : (
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Typography>{file?.name}</Typography>
-                      <EditOutlined />
-                    </Box>
-                  )}
-                </div>
-              ) : (
-                <Typography>Karta została już dodana</Typography>
-              )}
-            </Box>
-            <IconButton color="primary" onClick={() => setFile(null)}>
-              <DeleteOutlined />
-            </IconButton>
-          </Box>
-          <FormControl variant="standard" component="fieldset">
-            <FormControlLabel
-              control={
-                <Switch
-                  {...register("active")}
-                  checked={!!value.active}
-                  onChange={(event) =>
-                    setValue((prevState) => ({
-                      ...prevState,
-                      active: event.target.checked ? 1 : 0,
-                    }))
-                  }
+        <Formik
+          enableReinitialize
+          onSubmit={handleProductForm}
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleBlur,
+            handleChange,
+            handleSubmit,
+            setFieldValue,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <Box display="flex" flexDirection="column" gap="20px">
+                <TextField
+                  label="Nazwa"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.name}
+                  name="name"
+                  error={Boolean(touched.name) && Boolean(errors.name)}
+                  helperText={touched.name && errors.name}
                 />
-              }
-              label="Wł./Wył. produkt"
-            />
-          </FormControl>
-        </Box>
-        <Box sx={modalStyles.buttons}>
-          <Button variant="contained" type="submit">
-            Wyślij
-          </Button>
-          <Button onClick={props.onClose}>Cancel</Button>
-        </Box>
-      </Box>
+                <TextField
+                  label="Druga nazwa"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.secondName}
+                  name="secondName"
+                  error={
+                    Boolean(touched.secondName) && Boolean(errors.secondName)
+                  }
+                  helperText={touched.secondName && errors.secondName}
+                />
+                <TextField
+                  label="j.m."
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.unit}
+                  name="unit"
+                  error={Boolean(touched.unit) && Boolean(errors.unit)}
+                  helperText={touched.unit && errors.unit}
+                  select
+                >
+                  <MenuItem value={Units.l}>l</MenuItem>
+                  <MenuItem value={Units.kg}>kg</MenuItem>
+                </TextField>
+                <TextField
+                  label="Miejsce"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.place}
+                  name="place"
+                  error={Boolean(touched.place) && Boolean(errors.place)}
+                  helperText={touched.place && errors.place}
+                />
+                <FormControl variant="standard" component="fieldset">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        name="active"
+                        value={values.active}
+                        checked={values.active === 1}
+                        onChange={(event, checked) => {
+                          setFieldValue("active", checked ? 1 : 0);
+                        }}
+                      />
+                    }
+                    label="Wł./Wył. produkt"
+                  />
+                </FormControl>
+
+                {/* FILE DROPZONE */}
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Box
+                    border={`1px dashed lightgrey`}
+                    borderRadius="5px"
+                    p="1rem"
+                    width="100%"
+                  >
+                    {initialValues.productDataSheet !== 1 ? (
+                      <div {...getRootProps()}>
+                        <input {...getInputProps()} />
+                        {!file.file ? (
+                          isDragActive ? (
+                            <Typography>Możesz puścić plik</Typography>
+                          ) : (
+                            <Typography>Dodaj kartę charakterystyki</Typography>
+                          )
+                        ) : (
+                          <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                          >
+                            <Typography>{file.file?.name}</Typography>
+                            <EditOutlined />
+                          </Box>
+                        )}
+                      </div>
+                    ) : (
+                      <Typography>Karta została już dodana</Typography>
+                    )}
+                  </Box>
+                  <IconButton
+                    color="primary"
+                    onClick={() => setFile(defaultValueDataSheet)}
+                  >
+                    <DeleteOutlined />
+                  </IconButton>
+                </Box>
+
+                {/* BUTTONS */}
+                <Box display="flex" justifyContent="space-between" gap="10px">
+                  <Button variant="contained" type="submit" fullWidth>
+                    Wyślij
+                  </Button>
+                  <Button onClick={props.onClose}>Cancel</Button>
+                </Box>
+              </Box>
+            </form>
+          )}
+        </Formik>
+      </Paper>
     </Modal>
   );
 };

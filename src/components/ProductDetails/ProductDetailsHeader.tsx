@@ -6,6 +6,7 @@ interface Props {
   secondName: string | undefined;
   qty: string | undefined;
   place: string | undefined;
+  children: React.ReactNode;
 }
 
 export const ProductDetailsHeader = ({
@@ -13,18 +14,22 @@ export const ProductDetailsHeader = ({
   secondName,
   qty,
   place,
+  children,
 }: Props) => {
   return (
-    <Box m="25px">
-      <Typography variant="h4">
-        {name} {secondName}
-      </Typography>
-      <Typography sx={{ mt: "20px" }}>
-        Ilość: <b>{qty}</b>
-      </Typography>
-      <Typography sx={{ mt: "20px" }}>
-        Miejsce: <b>{place}</b>
-      </Typography>
+    <Box display="flex" justifyContent="space-between" alignItems="start">
+      <Box m="25px">
+        <Typography variant="h4">
+          {name} {secondName}
+        </Typography>
+        <Typography sx={{ mt: "20px" }}>
+          Ilość: <b>{qty}</b>
+        </Typography>
+        <Typography sx={{ mt: "20px" }}>
+          Miejsce: <b>{place}</b>
+        </Typography>
+      </Box>
+      {children}
     </Box>
   );
 };

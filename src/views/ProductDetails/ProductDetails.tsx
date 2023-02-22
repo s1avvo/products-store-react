@@ -14,25 +14,33 @@ export const ProductDetails = () => {
   const [goodsIssue, setGoodsIssue] = useState<GoodsEntity[]>([]);
   const [goodsReception, setGoodsReception] = useState<GoodsEntity[]>([]);
   const [isProductDataSheet, setIsProductDataSheet] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const resProduct = await fetch(
-        `http://localhost:3001/products/${productId}`
-      );
-      const product = await resProduct.json();
-      setProduct(product);
-      setIsProductDataSheet(product.productDataSheet === 1);
+      try {
+        setIsLoading(true);
+        const resProduct = await fetch(
+          `http://localhost:3001/products/${productId}`
+        );
+        const product = await resProduct.json();
+        setProduct(product);
+        setIsProductDataSheet(product.productDataSheet === 1);
 
-      const resDetails = await fetch(
-        `http://localhost:3001/details/${productId}`,
-        {
-          method: "GET",
-        }
-      );
-      const details = await resDetails.json();
-      setGoodsIssue(details.goodsIssue as GoodsEntity[]);
-      setGoodsReception(details.goodsReception as GoodsEntity[]);
+        const resDetails = await fetch(
+          `http://localhost:3001/details/${productId}`,
+          {
+            method: "GET",
+          }
+        );
+        const details = await resDetails.json();
+        setGoodsIssue(details.goodsIssue as GoodsEntity[]);
+        setGoodsReception(details.goodsReception as GoodsEntity[]);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsLoading(false);
+      }
     })();
   }, [productId]);
 
@@ -58,14 +66,16 @@ export const ProductDetails = () => {
           secondName={product?.secondName}
           qty={`${product?.qty}${product?.unit}`}
           place={product?.place}
-        />
-        {/* PRODUCT DATA SHEET .PDF */}
-        {isProductDataSheet ? <DownloadFile id={productId!} /> : null}
+        >
+          {/* PRODUCT DATA SHEET .PDF */}
+          {isProductDataSheet ? <DownloadFile id={productId!} /> : null}
+        </ProductDetailsHeader>
 
         {/* GOODSIssue AND GOODSReception */}
         <SupplyDetails
           goodsIssue={goodsIssue}
           goodsReception={goodsReception}
+          isLoading={isLoading}
         />
       </Paper>
     </Box>

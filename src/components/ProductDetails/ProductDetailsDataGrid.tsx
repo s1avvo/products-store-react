@@ -11,9 +11,10 @@ import { GoodsEntity } from "types";
 interface Props {
   rows: GoodsEntity[];
   columns: GridColDef[];
+  isLoading: boolean;
 }
 
-export const ProductDetailsDataGrid = ({ rows, columns }: Props) => {
+export const ProductDetailsDataGrid = ({ rows, columns, isLoading }: Props) => {
   const [pageSize, setPageSize] = useState(25);
 
   return (
@@ -29,7 +30,7 @@ export const ProductDetailsDataGrid = ({ rows, columns }: Props) => {
           </GridToolbarContainer>
         ),
       }}
-      loading={!rows.length}
+      loading={isLoading}
       autoHeight={true}
       sx={{ padding: "10px" }}
       disableSelectionOnClick
