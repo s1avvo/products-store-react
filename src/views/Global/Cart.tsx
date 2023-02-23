@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
 import {
@@ -51,6 +51,8 @@ export const Cart = () => {
 
   const handelGoodsReception = (event: FormEvent) => {
     event.preventDefault();
+
+    console.log(cart);
 
     cart.map(async (item) => {
       try {
@@ -110,6 +112,10 @@ export const Cart = () => {
       }
     });
   };
+
+  useEffect(() => {
+    setCheck(false);
+  }, [isCartOpen]);
 
   return (
     <Box
@@ -200,22 +206,13 @@ export const Cart = () => {
           <Box m="20px 0" display="flex" justifyContent="end" gap="10px">
             <Button
               variant="contained"
-              onClick={() => {
-                dispatch(setIsCartOpen());
-                setCheck(false);
-              }}
+              type="submit"
+              onClick={() => dispatch(setIsCartOpen())}
               disabled={!check}
             >
               Wyślij
             </Button>
-            <Button
-              onClick={() => {
-                dispatch(setIsCartOpen());
-                setCheck(false);
-              }}
-            >
-              Cancel
-            </Button>
+            <Button onClick={() => dispatch(setIsCartOpen())}>Anuluj</Button>
           </Box>
         </Box>
       </Box>
