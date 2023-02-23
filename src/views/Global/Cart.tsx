@@ -1,10 +1,10 @@
-import React, { FormEvent } from "react";
-import { CartSupply } from "types";
+import React, { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
 import {
   Box,
   Button,
+  Checkbox,
   Divider,
   FormControl,
   IconButton,
@@ -12,6 +12,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -21,7 +22,7 @@ import {
   clearCart,
   removeFromCart,
   setIsCartOpen,
-  setIsGoodsOrSupply,
+  setGoodsIssueOrReception,
 } from "../../state/cartSlice";
 
 import { setStatus, updateQty } from "../../state/productListSlice";
@@ -34,52 +35,43 @@ const FlexBox = styled(Box)`
 
 export const Cart = () => {
   const dispatch = useAppDispatch();
+  const token = useAppSelector((state) => state.auth.token);
   const cart = useAppSelector((state) => state.cart.cart);
-  const cartType = useAppSelector((state) => state.cart.isGoodsOrSupply);
+  const cartType = useAppSelector((state) => state.cart.goodsIssueOrReception);
   const isCartOpen = useAppSelector((state) => state.cart.isCartOpen);
+  const [check, setCheck] = useState(false);
 
   const handleChangeCartType = (event: SelectChangeEvent) => {
-    dispatch(setIsGoodsOrSupply(event.target.value as "goods" | "supply"));
+    dispatch(
+      setGoodsIssueOrReception(
+        event.target.value as "goodsIssue" | "goodsReception"
+      )
+    );
   };
 
-  const handelSupply = async (event: FormEvent) => {
+  const handelGoodsReception = (event: FormEvent) => {
     event.preventDefault();
 
-    try {
-      const supplyId = await fetch(`http://localhost:3001/store/supply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          person: "Katarzyna Nadolna",
-        }),
-      });
-      const id = await supplyId.json();
-
-      await handelSupplyItems(id.supplyId);
-      dispatch(clearCart());
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const handelSupplyItems = (supplyId: string) => {
-    cart.map(async (item: CartSupply) => {
+    cart.map(async (item) => {
       try {
         dispatch(setStatus("pending"));
-        await fetch(`http://localhost:3001/store/supply/item`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: item.amount,
-            productId: item.productId,
-            supplyId: supplyId,
-          }),
-        });
+        await fetch(
+          `http://localhost:3001/store/goods-reception/${item.productId}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              amount: item.amount,
+              person: item.person,
+              productId: item.productId,
+            }),
+          }
+        );
         dispatch(updateQty({ id: item.productId, qty: item.amount }));
+        dispatch(clearCart());
       } catch (err) {
         console.error(err);
       } finally {
@@ -88,23 +80,27 @@ export const Cart = () => {
     });
   };
 
-  const handelGoods = (event: FormEvent) => {
+  const handelGoodsIssue = (event: FormEvent) => {
     event.preventDefault();
 
-    cart.map(async (item: CartSupply) => {
+    cart.map(async (item) => {
       try {
         dispatch(setStatus("pending"));
-        await fetch(`http://localhost:3001/store/goods/${item.productId}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: item.amount,
-            person: item.person,
-            productId: item.productId,
-          }),
-        });
+        await fetch(
+          `http://localhost:3001/store/goods-issue/${item.productId}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              amount: item.amount,
+              person: item.person,
+              productId: item.productId,
+            }),
+          }
+        );
         dispatch(updateQty({ id: item.productId, qty: -item.amount }));
         dispatch(clearCart());
       } catch (err) {
@@ -128,17 +124,21 @@ export const Cart = () => {
       overflow="auto"
     >
       <Box
+        position="absolute"
+        right="0px"
         margin="0 auto"
-        width="max(500px, 40%)"
+        width="max(400px, 30%)"
         height="100%"
         bgcolor="white"
         component="form"
-        onSubmit={cartType === "goods" ? handelGoods : handelSupply}
+        onSubmit={
+          cartType === "goodsIssue" ? handelGoodsIssue : handelGoodsReception
+        }
       >
         <Box padding="30px" overflow="auto" height="100%">
           {/* HEADER */}
-          <Box mb="15px">
-            <FormControl fullWidth>
+          <FlexBox mb="15px">
+            <FormControl size="small" fullWidth>
               <InputLabel id="cart-select-label">Koszyk</InputLabel>
               <Select
                 labelId="cart-select-label"
@@ -147,20 +147,28 @@ export const Cart = () => {
                 label="Koszyk"
                 onChange={handleChangeCartType}
               >
-                <MenuItem value="goods">
+                <MenuItem value="goodsIssue">
                   <Typography variant="h5">Wydanie ({cart.length})</Typography>
                 </MenuItem>
-                <MenuItem value="supply">
+                <MenuItem value="goodsReception">
                   <Typography variant="h5">
-                    Zamówienie ({cart.length})
+                    Przyjęcie ({cart.length})
                   </Typography>
                 </MenuItem>
               </Select>
             </FormControl>
-          </Box>
+            <Tooltip title="Sprawdź typ koszyka i potwierdź przed wysłaniem.">
+              <Checkbox
+                checked={check}
+                onChange={() => setCheck(!check)}
+                inputProps={{ "aria-label": "controlled" }}
+                sx={{ "& .MuiSvgIcon-root": { fontSize: "2.5rem" } }}
+              />
+            </Tooltip>
+          </FlexBox>
 
           {/* CART LIST */}
-          {cart.map((item: CartSupply) => (
+          {cart.map((item) => (
             <Box key={`${item.productId}`}>
               <FlexBox p="15px 0">
                 <Box flex="1 1 60%">
@@ -188,17 +196,26 @@ export const Cart = () => {
             </Box>
           ))}
           {/*BUTTONS*/}
+
           <Box m="20px 0" display="flex" justifyContent="end" gap="10px">
             <Button
               variant="contained"
-              type="submit"
               onClick={() => {
                 dispatch(setIsCartOpen());
+                setCheck(false);
+              }}
+              disabled={!check}
+            >
+              Wyślij
+            </Button>
+            <Button
+              onClick={() => {
+                dispatch(setIsCartOpen());
+                setCheck(false);
               }}
             >
-              {cartType === "goods" ? <span>Wydaj</span> : <span>Zamów</span>}
+              Cancel
             </Button>
-            <Button onClick={() => dispatch(setIsCartOpen())}>Cancel</Button>
           </Box>
         </Box>
       </Box>

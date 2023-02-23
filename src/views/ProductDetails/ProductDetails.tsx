@@ -1,55 +1,83 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { ProductEntity, GoodsEntity, SupplyEntity } from "types";
-import { Box, Typography } from "@mui/material";
-import { SupplyDetails } from "./SupplyDetails";
+import { SupplyDetails } from "../../components/ProductDetails/SupplyDetails";
+import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDetailsHeader";
+
+import { GoodsEntity, ProductEntity } from "types";
+import { Box, Paper, Typography } from "@mui/material";
+import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
 
 export const ProductDetails = () => {
   const { productId } = useParams();
-  const [item, setItem] = useState<ProductEntity | null>(null);
-  const [goods, setGoods] = useState<GoodsEntity[]>([]);
-  const [supply, setSupply] = useState<SupplyEntity[]>([]);
-
-  async function getItem() {
-    const res = await fetch(`http://localhost:3001/details/${productId}`, {
-      method: "GET",
-    });
-    const item = await res.json();
-    setItem(item.product as ProductEntity);
-    setGoods(item.goods as GoodsEntity[]);
-    setSupply(item.supply as SupplyEntity[]);
-  }
+  const [product, setProduct] = useState<ProductEntity | null>(null);
+  const [goodsIssue, setGoodsIssue] = useState<GoodsEntity[]>([]);
+  const [goodsReception, setGoodsReception] = useState<GoodsEntity[]>([]);
+  const [isProductDataSheet, setIsProductDataSheet] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    getItem();
+    (async () => {
+      try {
+        setIsLoading(true);
+        const resProduct = await fetch(
+          `http://localhost:3001/products/${productId}`
+        );
+        const product = await resProduct.json();
+        setProduct(product);
+        setIsProductDataSheet(product.productDataSheet === 1);
+
+        const resDetails = await fetch(
+          `http://localhost:3001/details/${productId}`,
+          {
+            method: "GET",
+          }
+        );
+        const details = await resDetails.json();
+        setGoodsIssue(details.goodsIssue as GoodsEntity[]);
+        setGoodsReception(details.goodsReception as GoodsEntity[]);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, [productId]);
 
   return (
-    <Box width="80%" m="80px auto">
-      <Box display="flex" flexWrap="wrap" columnGap="40px">
-        <Box flex="1 1 50%" mb="20px">
-          <Box m="25px 0">
-            <Typography variant="h4">
-              {item?.name} - {item?.secondName}
-            </Typography>
-            <Typography sx={{ mt: "20px" }}>
-              Ilość:{" "}
-              <b>
-                {item?.qty} {item?.unit}
-              </b>
-            </Typography>
-            <Typography sx={{ mt: "20px" }}>
-              Miejsce: <b>{item?.place}</b>
-            </Typography>
-          </Box>
-        </Box>
+    <Box width="80%" margin="20px auto">
+      <Box display="flex" justifyContent="center" alignItems="center" m="15px">
+        <Typography variant="h4">
+          Historia <b>{product?.name}</b>
+        </Typography>
       </Box>
+      <Paper
+        sx={{
+          margin: "0 auto",
+          height: "auto",
+          overflow: "auto",
+          backgroundColor: "rgba(250, 250, 250, 0.95)",
+          zIndex: "10",
+        }}
+      >
+        {/* HEADER */}
+        <ProductDetailsHeader
+          name={product?.name}
+          secondName={product?.secondName}
+          qty={`${product?.qty}${product?.unit}`}
+          place={product?.place}
+        >
+          {/* PRODUCT DATA SHEET .PDF */}
+          {isProductDataSheet ? <DownloadFile id={productId!} /> : null}
+        </ProductDetailsHeader>
 
-      {/* GOODS AND SUPPLY */}
-      <Box>
-        <SupplyDetails goods={goods} supply={supply} />
-      </Box>
+        {/* GOODSIssue AND GOODSReception */}
+        <SupplyDetails
+          goodsIssue={goodsIssue}
+          goodsReception={goodsReception}
+          isLoading={isLoading}
+        />
+      </Paper>
     </Box>
   );
 };

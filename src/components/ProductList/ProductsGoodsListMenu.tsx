@@ -29,7 +29,7 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
         >
-          filtruj
+          top 25
         </Button>
       </Tooltip>
       <Menu
@@ -42,7 +42,7 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
       >
         <MenuItem
           onClick={() => {
-            handleFilter("products-goods");
+            handleFilter("products-goods-issue-frequently");
             dispatch(setStatus("idle"));
             setAnchorEl(null);
           }}
@@ -51,12 +51,30 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            handleFilter("products-supply");
+            handleFilter("products-goods-reception-frequently");
             dispatch(setStatus("idle"));
             setAnchorEl(null);
           }}
         >
-          Ostatniozamawiane
+          Najcześciej przyjmowane
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleFilter("products-goods-issue-recently");
+            dispatch(setStatus("idle"));
+            setAnchorEl(null);
+          }}
+        >
+          Ostatnio wydane
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleFilter("products-goods-reception-recently");
+            dispatch(setStatus("idle"));
+            setAnchorEl(null);
+          }}
+        >
+          Ostatnio przyjęte
         </MenuItem>
       </Menu>
     </>

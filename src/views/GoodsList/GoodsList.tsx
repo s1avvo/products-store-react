@@ -1,73 +1,58 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
-import { CartSupply, OrderViewEntity } from "types";
-
-import { Box, Typography } from "@mui/material";
-import { addToCart, setCartProduct } from "../../state/cartSlice";
+import { Box, SelectChangeEvent } from "@mui/material";
+import { addToCart, Cart, setCartProduct } from "../../state/cartSlice";
 import {
-  DataGrid,
   GridActionsCellItem,
   GridColDef,
   GridRenderEditCellParams,
-  GridToolbarColumnsButton,
-  GridToolbarContainer,
-  GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 
-import {
-  AddCircleOutlineOutlined,
-  ArrowCircleRightOutlined,
-} from "@mui/icons-material";
+import { AddCircleOutlineOutlined } from "@mui/icons-material";
 
-import { SupplyForm } from "../../components/SupplyForm";
+import { SupplyForm } from "../../components/Global/SupplyForm";
+import { GoodsDataGrid } from "../../components/GoodsList/GoodsDataGrid";
+import { TopBox } from "../../components/Global/TopBox";
+import { GoodsListMenu } from "../../components/GoodsList/GoodsListMenu";
 
-export const GoodsList = () => {
-  const navigate = useNavigate();
-  const [goodsList, setGoodsList] = useState<OrderViewEntity[]>([]);
-  const [pageSize, setPageSize] = useState(10);
-  const [openAmount, setOpenAmount] = useState(false);
+interface Props {
+  filter: string;
+}
+
+export const GoodsList = (props: Props) => {
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart.cart);
 
+  const [range, setRange] = useState<string>("1");
+  const [goodsList, setGoodsList] = useState<any[]>([]);
+  const [openAmount, setOpenAmount] = useState(false);
+
   async function getItems() {
-    const res = await fetch("http://localhost:3001/goods", { method: "GET" });
+    const res = await fetch(`http://localhost:3001/${props.filter}/${range}`, {
+      method: "GET",
+    });
     setGoodsList(await res.json());
   }
 
   useEffect(() => {
     getItems();
-  }, []);
+  }, [props.filter, range]);
+
+  /*RANGE*/
+
+  const handleRange = (event: SelectChangeEvent) => {
+    setRange(event.target.value);
+  };
 
   /*SET CART ITEM*/
 
-  const setCartItem = (cartItem: CartSupply) => {
+  const setCartItem = (cartItem: Cart) => {
     dispatch(addToCart(cartItem));
     setOpenAmount(false);
   };
 
   const columns: GridColDef[] = [
-    {
-      field: "Szczegóły",
-      headerName: "",
-      width: 50,
-      headerAlign: "center",
-      align: "center",
-      sortable: false,
-      filterable: false,
-      renderCell: (cellValues: GridRenderEditCellParams<string>) => {
-        return [
-          <GridActionsCellItem
-            key={`${cellValues.id}-details`}
-            icon={<ArrowCircleRightOutlined />}
-            label="Details"
-            onClick={() => navigate(`/details/${cellValues.row.id}`)}
-            color="inherit"
-          />,
-        ];
-      },
-    },
     { field: "name", headerName: "Nazwa", flex: 1, minWidth: 150 },
     { field: "qty", headerName: "Stan", flex: 0.5, type: "number" },
     {
@@ -77,10 +62,10 @@ export const GoodsList = () => {
       sortable: false,
       filterable: false,
     },
-    { field: "amount", headerName: "Ilość wyd.", flex: 0.5, type: "number" },
+    { field: "amount", headerName: "Ilość", flex: 0.5, type: "number" },
     {
-      field: "data",
-      headerName: "Data wyd.",
+      field: "date",
+      headerName: "Data",
       flex: 0.8,
       type: "date",
       valueGetter: ({ value }) => value && new Date(value).toLocaleDateString(),
@@ -101,9 +86,7 @@ export const GoodsList = () => {
             icon={<AddCircleOutlineOutlined />}
             label="Add"
             disabled={
-              !!cart.find(
-                (item: CartSupply) => item.productId === cellValues.row.id
-              )
+              !!cart.find((item) => item.productId === cellValues.row.id)
             }
             onClick={() => {
               dispatch(setCartProduct(cellValues.row));
@@ -123,40 +106,17 @@ export const GoodsList = () => {
         onClose={() => setOpenAmount(false)}
         setCartItem={setCartItem}
       />
-      <Box width="80%" margin="80px auto 50px auto">
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          m="15px"
+      <Box width="80%" margin="20px auto">
+        <TopBox
+          name={
+            props.filter === "all-goods-issue"
+              ? "Wydań produktów"
+              : "Przyjęć produktów"
+          }
         >
-          <Typography variant="h4">
-            Lista <b>Wydań</b>
-          </Typography>
-        </Box>
-        <Box margin="0 auto" height="75vh">
-          <DataGrid
-            rows={goodsList}
-            columns={columns}
-            getRowId={(row: OrderViewEntity) => row.idItem}
-            components={{
-              Toolbar: () => (
-                <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
-                  <GridToolbarColumnsButton />
-                  <GridToolbarQuickFilter />
-                </GridToolbarContainer>
-              ),
-            }}
-            loading={!goodsList.length}
-            sx={{ padding: "10px" }}
-            disableSelectionOnClick
-            // autoPageSize={true}
-            pagination
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            rowsPerPageOptions={[5, 10, 25]}
-          />
-        </Box>
+          <GoodsListMenu handleRange={handleRange} />
+        </TopBox>
+        <GoodsDataGrid rows={goodsList} columns={columns} />
       </Box>
     </>
   );

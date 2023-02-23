@@ -1,10 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProductEntity, QtyUpdate } from "types";
+import { ProductEntity, QtyUpdate, CreateProduct } from "types";
 import { RootState } from "../app/store";
 
 interface ProductsListState {
   productsList: ProductEntity[];
-  status: "idle" | "loading" | "succeeded" | "failed";
+  status: "idle" | "pending" | "succeeded" | "failed";
 }
 
 const initialState: ProductsListState = {
@@ -14,11 +14,101 @@ const initialState: ProductsListState = {
 
 export const fetchProductsList = createAsyncThunk(
   "productsList/fetchProductsList",
-  async (path: string) => {
-    const response = await fetch(`http://localhost:3001/${path}`, {
-      method: "GET",
-    });
-    return response.json();
+  async (path: string, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`http://localhost:3001/${path}`, {
+        method: "GET",
+      });
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const addProductToList = createAsyncThunk(
+  "productsList/addProductToList",
+  async (
+    data: { product: CreateProduct; token: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch("http://localhost:3001/store/add", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data.product),
+      });
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const updateProductOnList = createAsyncThunk(
+  "productsList/updateProductOnList",
+  async (
+    data: { product: CreateProduct; token: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch("http://localhost:3001/store/update", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data.product),
+      });
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const updateProductDataSheet = createAsyncThunk(
+  "productsList/updateProductDataSheet",
+  async (
+    data: { id: string; token: string; file: FormData },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/store/upload/${data.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+          body: data.file,
+        }
+      );
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const deleteProductFromList = createAsyncThunk(
+  "productsList/deleteProductFromList",
+  async (data: { id: string; token: string }, { rejectWithValue }) => {
+    try {
+      await fetch("http://localhost:3001/store/delete", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: data.id }),
+      });
+    } catch (err) {
+      return rejectWithValue(err);
+    }
   }
 );
 
@@ -33,12 +123,6 @@ export const productListSlice = createSlice({
           : item
       );
     },
-    addToProductsList: (state, action: PayloadAction<ProductEntity>) => {
-      state.productsList.push(action.payload);
-    },
-    removeToProductsList: (state, action) => {
-      state.productsList.filter((item) => item.id !== action.payload.id);
-    },
     setStatus: (state, action) => {
       state.status = action.payload;
     },
@@ -46,7 +130,7 @@ export const productListSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(fetchProductsList.pending, (state) => {
-        state.status = "loading";
+        state.status = "pending";
       })
       .addCase(fetchProductsList.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -54,17 +138,37 @@ export const productListSlice = createSlice({
       })
       .addCase(fetchProductsList.rejected, (state) => {
         state.status = "failed";
+      })
+      .addCase(addProductToList.fulfilled, (state, action) => {
+        state.productsList.push(action.payload);
+        state.status = "idle";
+      })
+      .addCase(updateProductOnList.fulfilled, (state, action) => {
+        state.productsList.map((item) =>
+          item.id === action.meta.arg.product.id ? { ...action.meta.arg } : item
+        );
+        state.status = "idle";
+      })
+      .addCase(deleteProductFromList.fulfilled, (state, action) => {
+        state.productsList.filter((item) => item.id !== action.meta.arg.id);
+        state.status = "idle";
+      })
+      .addCase(updateProductDataSheet.fulfilled, (state, action) => {
+        state.productsList.map((item) =>
+          item.id === action.meta.arg.id
+            ? { ...item, productDataSheet: 1 }
+            : item
+        );
       });
   },
 });
 
-export const { updateQty, addToProductsList, removeToProductsList, setStatus } =
-  productListSlice.actions;
+export const { updateQty, setStatus } = productListSlice.actions;
 
 export const productListReducer = productListSlice.reducer;
 
 export const selectAllProducts = (state: RootState) =>
   state.productList.productsList;
 
-export const selectProductById = (state: RootState, productId: string) =>
-  state.productList.productsList.find((product) => product.id === productId);
+export const selectSingleProduct = (state: RootState, productId: string) =>
+  state.productList.productsList.find((item) => item.id === productId);

@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 import { useNavigate } from "react-router-dom";
 
 import {
   Badge,
   Box,
+  FormControl,
   IconButton,
-  Menu,
+  InputBase,
   MenuItem,
+  Select,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -15,20 +17,19 @@ import {
 import {
   PersonOutline,
   ShoppingBagOutlined,
-  MenuOutlined,
   HomeOutlined,
 } from "@mui/icons-material";
 
 import { setIsCartOpen } from "../../state/cartSlice";
 import { setStatus } from "../../state/productListSlice";
+import { setLogout } from "../../state/authSlice";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart.cart);
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const user = useAppSelector((state) => state.auth.user);
+  const isAuth = Boolean(useAppSelector((state) => state.auth.token));
 
   return (
     <>
@@ -45,6 +46,7 @@ export const Navbar = () => {
         <Box
           width="80%"
           margin="10px auto"
+          padding="5px 15px"
           display="flex"
           justifyContent="space-between"
           alignItems="center"
@@ -53,7 +55,7 @@ export const Navbar = () => {
             display="flex"
             alignItems="center"
             onClick={() => {
-              navigate("/");
+              isAuth ? navigate("/products-admin") : navigate("/");
               dispatch(setStatus("idle"));
             }}
             sx={{ "&:hover": { cursor: "pointer" } }}
@@ -63,15 +65,7 @@ export const Navbar = () => {
             </IconButton>
             <Typography>STRONA GŁÓWNA</Typography>
           </Box>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            columnGap="20px"
-            zIndex="2"
-          >
-            <IconButton sx={{ color: "black" }}>
-              <PersonOutline />
-            </IconButton>
+          <Box display="flex" gap="10px">
             <Badge
               badgeContent={cart.length}
               color="secondary"
@@ -86,52 +80,36 @@ export const Navbar = () => {
                 </IconButton>
               </Tooltip>
             </Badge>
-            <Tooltip title="Menu">
-              <IconButton
-                sx={{ color: "black" }}
-                onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-                  setAnchorEl(event.currentTarget);
-                }}
-                aria-controls={open ? "menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-              >
-                <MenuOutlined />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              id="menu"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={() => setAnchorEl(null)}
-              transformOrigin={{ horizontal: "right", vertical: "top" }}
-              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-            >
-              <MenuItem
-                onClick={() => {
-                  navigate(`/`);
-                  setAnchorEl(null);
-                }}
-              >
-                Lista produktów
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  navigate(`/goods`);
-                  setAnchorEl(null);
-                }}
-              >
-                Wydania
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  navigate(`/supply`);
-                  setAnchorEl(null);
-                }}
-              >
-                Przyjęcia
-              </MenuItem>
-            </Menu>
+            {isAuth ? (
+              <FormControl variant="standard">
+                <Select
+                  value={`${user}`}
+                  sx={{
+                    borderRadius: "0.25rem",
+                    border: "1px solid #1976d2",
+                    p: "0.15rem 1rem",
+                    "& .MuiSvgIcon-root": {
+                      width: "3rem",
+                    },
+                  }}
+                  input={<InputBase />}
+                >
+                  <MenuItem value={`${user}`}>{`${user}`}</MenuItem>
+                  <MenuItem onClick={() => dispatch(setLogout())}>
+                    Wyloguj
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            ) : (
+              <Tooltip title="Zaloguj">
+                <IconButton
+                  sx={{ color: "black" }}
+                  onClick={() => navigate(`/auth`)}
+                >
+                  <PersonOutline />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
         </Box>
       </Box>
