@@ -1,9 +1,10 @@
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 
 import {
   Box,
   Button,
+  Checkbox,
   Divider,
   FormControl,
   IconButton,
@@ -11,6 +12,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -37,6 +39,7 @@ export const Cart = () => {
   const cart = useAppSelector((state) => state.cart.cart);
   const cartType = useAppSelector((state) => state.cart.goodsIssueOrReception);
   const isCartOpen = useAppSelector((state) => state.cart.isCartOpen);
+  const [check, setCheck] = useState(false);
 
   const handleChangeCartType = (event: SelectChangeEvent) => {
     dispatch(
@@ -121,8 +124,10 @@ export const Cart = () => {
       overflow="auto"
     >
       <Box
+        position="absolute"
+        right="0px"
         margin="0 auto"
-        width="max(500px, 40%)"
+        width="max(400px, 30%)"
         height="100%"
         bgcolor="white"
         component="form"
@@ -132,8 +137,8 @@ export const Cart = () => {
       >
         <Box padding="30px" overflow="auto" height="100%">
           {/* HEADER */}
-          <Box mb="15px">
-            <FormControl fullWidth>
+          <FlexBox mb="15px">
+            <FormControl size="small" fullWidth>
               <InputLabel id="cart-select-label">Koszyk</InputLabel>
               <Select
                 labelId="cart-select-label"
@@ -152,7 +157,15 @@ export const Cart = () => {
                 </MenuItem>
               </Select>
             </FormControl>
-          </Box>
+            <Tooltip title="Sprawdź typ koszyka i potwierdź przed wysłaniem.">
+              <Checkbox
+                checked={check}
+                onChange={() => setCheck(!check)}
+                inputProps={{ "aria-label": "controlled" }}
+                sx={{ "& .MuiSvgIcon-root": { fontSize: "2.5rem" } }}
+              />
+            </Tooltip>
+          </FlexBox>
 
           {/* CART LIST */}
           {cart.map((item) => (
@@ -183,17 +196,26 @@ export const Cart = () => {
             </Box>
           ))}
           {/*BUTTONS*/}
+
           <Box m="20px 0" display="flex" justifyContent="end" gap="10px">
             <Button
               variant="contained"
-              type="submit"
               onClick={() => {
                 dispatch(setIsCartOpen());
+                setCheck(false);
               }}
+              disabled={!check}
             >
               Wyślij
             </Button>
-            <Button onClick={() => dispatch(setIsCartOpen())}>Cancel</Button>
+            <Button
+              onClick={() => {
+                dispatch(setIsCartOpen());
+                setCheck(false);
+              }}
+            >
+              Cancel
+            </Button>
           </Box>
         </Box>
       </Box>

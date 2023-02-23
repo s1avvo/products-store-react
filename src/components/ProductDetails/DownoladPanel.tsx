@@ -25,7 +25,7 @@ export const DownloadFile = ({ id }: Props) => {
   };
 
   return (
-    <Box display="flex" gap="10px" justifyContent="end" marginRight="25px">
+    <Box display="flex" gap="10px" justifyContent="end" margin="25px">
       <Typography variant="h6">Karta charakterystyki:</Typography>
       <Button variant="contained" onClick={download} size="small">
         Otwórz
