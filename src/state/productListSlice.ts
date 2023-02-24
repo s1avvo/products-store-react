@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ProductEntity, QtyUpdate, CreateProduct } from "types";
 import { RootState } from "../app/store";
+import { apiUrl } from "../config/api";
 
 interface ProductsListState {
   productsList: ProductEntity[];
@@ -16,7 +17,7 @@ export const fetchProductsList = createAsyncThunk(
   "productsList/fetchProductsList",
   async (path: string, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:3001/${path}`, {
+      const response = await fetch(`${apiUrl}/${path}`, {
         method: "GET",
       });
       return await response.json();
@@ -33,7 +34,7 @@ export const addProductToList = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch("http://localhost:3001/store/add", {
+      const response = await fetch(`${apiUrl}/store/add`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${data.token}`,
@@ -55,7 +56,7 @@ export const updateProductOnList = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch("http://localhost:3001/store/update", {
+      const response = await fetch(`${apiUrl}/store/update`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${data.token}`,
@@ -77,16 +78,13 @@ export const updateProductDataSheet = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await fetch(
-        `http://localhost:3001/store/upload/${data.id}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${data.token}`,
-          },
-          body: data.file,
-        }
-      );
+      const response = await fetch(`${apiUrl}/store/upload/${data.id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+        body: data.file,
+      });
       return await response.json();
     } catch (err) {
       return rejectWithValue(err);
@@ -98,7 +96,7 @@ export const deleteProductFromList = createAsyncThunk(
   "productsList/deleteProductFromList",
   async (data: { id: string; token: string }, { rejectWithValue }) => {
     try {
-      await fetch("http://localhost:3001/store/delete", {
+      await fetch(`${apiUrl}/store/delete`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${data.token}`,

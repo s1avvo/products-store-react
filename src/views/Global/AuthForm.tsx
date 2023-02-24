@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../app/redux-hooks";
 import { setLogin } from "../../state/authSlice";
 import { useState } from "react";
+import { apiUrl } from "../../config/api";
 
 const loginSchema = yup.object().shape({
   email: yup.string().email("Niepoprawny email").required("Podaj email."),
@@ -30,7 +31,7 @@ export const AuthForm = () => {
     values: FormValues,
     onSubmitProps: FormikHelpers<FormValues>
   ) => {
-    const res = await fetch("http://localhost:3001/auth/login", {
+    const res = await fetch(`${apiUrl}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+import { apiUrl } from "../../config/api";
 import { SupplyDetails } from "../../components/ProductDetails/SupplyDetails";
 import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDetailsHeader";
 
@@ -20,19 +20,14 @@ export const ProductDetails = () => {
     (async () => {
       try {
         setIsLoading(true);
-        const resProduct = await fetch(
-          `http://localhost:3001/products/${productId}`
-        );
+        const resProduct = await fetch(`${apiUrl}/products/${productId}`);
         const product = await resProduct.json();
         setProduct(product);
         setIsProductDataSheet(product.productDataSheet === 1);
 
-        const resDetails = await fetch(
-          `http://localhost:3001/details/${productId}`,
-          {
-            method: "GET",
-          }
-        );
+        const resDetails = await fetch(`${apiUrl}/details/${productId}`, {
+          method: "GET",
+        });
         const details = await resDetails.json();
         setGoodsIssue(details.goodsIssue as GoodsEntity[]);
         setGoodsReception(details.goodsReception as GoodsEntity[]);

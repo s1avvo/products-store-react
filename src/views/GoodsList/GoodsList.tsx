@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
-
+import { apiUrl } from "../../config/api";
 import { Box, SelectChangeEvent } from "@mui/material";
 import { addToCart, Cart, setCartProduct } from "../../state/cartSlice";
 import {
@@ -29,7 +29,7 @@ export const GoodsList = (props: Props) => {
   const [openAmount, setOpenAmount] = useState(false);
 
   async function getItems() {
-    const res = await fetch(`http://localhost:3001/${props.filter}/${range}`, {
+    const res = await fetch(`${apiUrl}/${props.filter}/${range}`, {
       method: "GET",
     });
     setGoodsList(await res.json());

@@ -1,6 +1,6 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
-
+import { apiUrl } from "../../config/api";
 import {
   Box,
   Button,
@@ -57,21 +57,18 @@ export const Cart = () => {
     cart.map(async (item) => {
       try {
         dispatch(setStatus("pending"));
-        await fetch(
-          `http://localhost:3001/store/goods-reception/${item.productId}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              amount: item.amount,
-              person: item.person,
-              productId: item.productId,
-            }),
-          }
-        );
+        await fetch(`${apiUrl}/store/goods-reception/${item.productId}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: item.amount,
+            person: item.person,
+            productId: item.productId,
+          }),
+        });
         dispatch(updateQty({ id: item.productId, qty: item.amount }));
         dispatch(clearCart());
       } catch (err) {
@@ -88,21 +85,18 @@ export const Cart = () => {
     cart.map(async (item) => {
       try {
         dispatch(setStatus("pending"));
-        await fetch(
-          `http://localhost:3001/store/goods-issue/${item.productId}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              amount: item.amount,
-              person: item.person,
-              productId: item.productId,
-            }),
-          }
-        );
+        await fetch(`${apiUrl}/store/goods-issue/${item.productId}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: item.amount,
+            person: item.person,
+            productId: item.productId,
+          }),
+        });
         dispatch(updateQty({ id: item.productId, qty: -item.amount }));
         dispatch(clearCart());
       } catch (err) {

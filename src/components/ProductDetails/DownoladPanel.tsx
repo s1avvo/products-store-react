@@ -1,4 +1,5 @@
 import React from "react";
+import { apiUrl } from "../../config/api";
 import { Box, Button, Typography } from "@mui/material";
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 export const DownloadFile = ({ id }: Props) => {
   const download = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/download/${id}.pdf`, {
+      const res = await fetch(`${apiUrl}/download/${id}.pdf`, {
         method: "GET",
         headers: {
           "Content-Type": "application/pdf",
