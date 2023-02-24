@@ -3,24 +3,25 @@ import { Box, Typography } from "@mui/material";
 
 interface Props {
   name: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export const TopBox = (props: Props) => {
   return (
     <Box
       display="flex"
-      justifyContent="center"
+      justifyContent="space-between"
       alignItems="center"
-      position="relative"
-      m="15px"
+      margin="15px 5px 15px 15px"
     >
-      <Box position="absolute">
-        <Typography variant="h4">
-          Lista <b>{props.name}</b>
+      <Box>
+        <Typography variant="h4" color="#5A5B5B">
+          {props.name}
         </Typography>
       </Box>
-      <Box marginLeft="auto">{props.children}</Box>
+      <Box minWidth="120px">
+        <Box>{props.children}</Box>
+      </Box>
     </Box>
   );
 };

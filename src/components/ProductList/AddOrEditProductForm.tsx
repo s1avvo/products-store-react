@@ -112,12 +112,12 @@ export const AddOrEditProductForm = (props: Props) => {
     >
       <Paper
         sx={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: "max(400px, 30%)",
+          position: "absolute",
+          right: "0px",
+          width: "max(420px, 30%)",
           margin: "0 auto",
+          height: "100%",
+          backgroundColor: "white",
           padding: "20px",
           gap: "20px",
         }}

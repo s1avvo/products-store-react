@@ -65,7 +65,7 @@ export const SupplyForm = (props: Props) => {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: "max(400px, 30%)",
+          width: "max(300px, 30%)",
           margin: "0 auto",
           padding: "20px",
           gap: "20px",

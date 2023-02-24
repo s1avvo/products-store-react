@@ -5,8 +5,9 @@ import { SupplyDetails } from "../../components/ProductDetails/SupplyDetails";
 import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDetailsHeader";
 
 import { GoodsEntity, ProductEntity } from "types";
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Paper } from "@mui/material";
 import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
+import { TopBox } from "../../components/Global/TopBox";
 
 export const ProductDetails = () => {
   const { productId } = useParams();
@@ -40,12 +41,11 @@ export const ProductDetails = () => {
   }, [productId]);
 
   return (
-    <Box width="80%" margin="20px auto">
-      <Box display="flex" justifyContent="center" alignItems="center" m="15px">
-        <Typography variant="h4">
-          Historia <b>{product?.name}</b>
-        </Typography>
-      </Box>
+    <Box width="90%" margin="20px auto">
+      <TopBox name="Historia">
+        {/* PRODUCT DATA SHEET .PDF */}
+        {isProductDataSheet ? <DownloadFile id={productId!} /> : null}
+      </TopBox>
       <Paper
         sx={{
           margin: "0 auto",
@@ -61,10 +61,7 @@ export const ProductDetails = () => {
           secondName={product?.secondName}
           qty={`${product?.qty}${product?.unit}`}
           place={product?.place}
-        >
-          {/* PRODUCT DATA SHEET .PDF */}
-          {isProductDataSheet ? <DownloadFile id={productId!} /> : null}
-        </ProductDetailsHeader>
+        />
 
         {/* GOODSIssue AND GOODSReception */}
         <SupplyDetails

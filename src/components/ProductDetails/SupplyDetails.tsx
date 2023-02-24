@@ -3,7 +3,7 @@ import { GoodsEntity } from "types";
 import { TabPanel } from "./TabPanel";
 import { ProductDetailsDataGrid } from "./ProductDetailsDataGrid";
 
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 
 interface Props {
@@ -17,19 +17,23 @@ export const SupplyDetails = ({
   goodsReception,
   isLoading,
 }: Props) => {
+  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
   const [value, setValue] = useState("goods");
 
   const columns: GridColDef[] = [
     {
       field: "date",
       headerName: "Data",
-      flex: 0.75,
+      flex: 1,
       minWidth: 100,
       type: "date",
-      valueGetter: ({ value }) => value && value.slice(0, -5).replace("T", " "),
+      valueGetter: ({ value }) =>
+        isNonMobileScreens
+          ? value && value.slice(0, -5).replace("T", " ")
+          : value && value.slice(0, -14),
     },
     { field: "amount", headerName: "Ilość", flex: 0.75, type: "number" },
-    { field: "person", headerName: "Osoba", flex: 2 },
+    { field: "person", headerName: "Osoba", flex: 1.5 },
   ];
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {

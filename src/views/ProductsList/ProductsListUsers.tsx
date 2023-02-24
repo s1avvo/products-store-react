@@ -69,8 +69,8 @@ export const ProductsListUsers = () => {
 
   return (
     <>
-      <Box width="80%" margin="20px auto">
-        <TopBox name="Productów">
+      <Box width="90%" margin="20px auto">
+        <TopBox name="Lista">
           <ProductsGoodsListMenu handleFilter={handleFilter} />
         </TopBox>
         <ProductsDataGrid

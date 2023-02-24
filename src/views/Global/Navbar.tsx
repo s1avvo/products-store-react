@@ -44,9 +44,9 @@ export const Navbar = () => {
       />
       <Box display="flex" alignItems="flex-start" width="100%" color="black">
         <Box
-          width="80%"
+          width="90%"
           margin="10px auto"
-          padding="5px 15px"
+          padding="5px"
           display="flex"
           justifyContent="space-between"
           alignItems="center"

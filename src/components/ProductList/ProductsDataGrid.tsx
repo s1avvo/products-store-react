@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Paper } from "@mui/material";
+import { Paper, useMediaQuery } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
-  GridToolbarColumnsButton,
   GridToolbarContainer,
+  GridToolbarFilterButton,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +18,8 @@ interface Props {
 
 export const ProductsDataGrid = ({ rows, columns, postStatus }: Props) => {
   const navigate = useNavigate();
-  const [pageSize, setPageSize] = useState(25);
+  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
+  const [pageSize, setPageSize] = useState(10);
 
   return (
     <Paper
@@ -36,7 +37,7 @@ export const ProductsDataGrid = ({ rows, columns, postStatus }: Props) => {
         components={{
           Toolbar: () => (
             <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
-              <GridToolbarColumnsButton />
+              {isNonMobileScreens && <GridToolbarFilterButton />}
               <GridToolbarQuickFilter />
             </GridToolbarContainer>
           ),
@@ -54,6 +55,14 @@ export const ProductsDataGrid = ({ rows, columns, postStatus }: Props) => {
             ? navigate(`/details/${params.row.id}`)
             : null
         }
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              place: isNonMobileScreens,
+              secondName: isNonMobileScreens,
+            },
+          },
+        }}
       />
     </Paper>
   );

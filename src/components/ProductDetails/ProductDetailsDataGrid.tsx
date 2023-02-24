@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import {
   DataGrid,
   GridColDef,
-  GridToolbarColumnsButton,
   GridToolbarContainer,
+  GridToolbarFilterButton,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import { GoodsEntity } from "types";
+import { useMediaQuery } from "@mui/material";
 
 interface Props {
   rows: GoodsEntity[];
@@ -15,7 +16,8 @@ interface Props {
 }
 
 export const ProductDetailsDataGrid = ({ rows, columns, isLoading }: Props) => {
-  const [pageSize, setPageSize] = useState(25);
+  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
+  const [pageSize, setPageSize] = useState(10);
 
   return (
     <DataGrid
@@ -25,14 +27,14 @@ export const ProductDetailsDataGrid = ({ rows, columns, isLoading }: Props) => {
       components={{
         Toolbar: () => (
           <GridToolbarContainer sx={{ justifyContent: "space-between" }}>
-            <GridToolbarColumnsButton />
+            {isNonMobileScreens && <GridToolbarFilterButton />}
             <GridToolbarQuickFilter />
           </GridToolbarContainer>
         ),
       }}
       loading={isLoading}
       autoHeight={true}
-      sx={{ padding: "10px" }}
+      sx={{ padding: "10px", border: "none" }}
       disableSelectionOnClick
       pagination
       pageSize={pageSize}

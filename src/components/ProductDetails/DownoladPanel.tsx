@@ -1,12 +1,13 @@
 import React from "react";
 import { apiUrl } from "../../config/api";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, useMediaQuery } from "@mui/material";
 
 interface Props {
   id: string;
 }
 
 export const DownloadFile = ({ id }: Props) => {
+  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
   const download = async () => {
     try {
       const res = await fetch(`${apiUrl}/download/${id}.pdf`, {
@@ -26,7 +27,12 @@ export const DownloadFile = ({ id }: Props) => {
   };
 
   return (
-    <Box display="flex" gap="10px" justifyContent="end" margin="25px">
+    <Box
+      display={isNonMobileScreens ? "flex" : "block"}
+      gap="10px"
+      justifyContent="end"
+      textAlign="end"
+    >
       <Typography variant="h6">Karta charakterystyki:</Typography>
       <Button variant="contained" onClick={download} size="small">
         Otwórz

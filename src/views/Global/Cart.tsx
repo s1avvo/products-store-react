@@ -127,7 +127,7 @@ export const Cart = () => {
         position="absolute"
         right="0px"
         margin="0 auto"
-        width="max(400px, 30%)"
+        width="max(420px, 30%)"
         height="100%"
         bgcolor="white"
         component="form"
