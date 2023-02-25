@@ -91,6 +91,7 @@ export const SupplyForm = (props: Props) => {
                   label="Ilość"
                   onBlur={handleBlur}
                   onChange={handleChange}
+                  onFocus={(event) => event.target.select()}
                   value={values.amount}
                   name="amount"
                   error={Boolean(touched.amount) && Boolean(errors.amount)}
