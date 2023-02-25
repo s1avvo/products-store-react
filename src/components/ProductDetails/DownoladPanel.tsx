@@ -27,13 +27,10 @@ export const DownloadFile = ({ id }: Props) => {
   };
 
   return (
-    <Box
-      display={isNonMobileScreens ? "flex" : "block"}
-      gap="10px"
-      justifyContent="end"
-      textAlign="end"
-    >
-      <Typography variant="h6">Karta charakterystyki:</Typography>
+    <Box display="flex" gap="10px" justifyContent="end" textAlign="end">
+      <Typography variant="h6">
+        {isNonMobileScreens ? "Karta charakterystyki:" : "Karta:"}
+      </Typography>
       <Button variant="contained" onClick={download} size="small">
         Otwórz
       </Button>

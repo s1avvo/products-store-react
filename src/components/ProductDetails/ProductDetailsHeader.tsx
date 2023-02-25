@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, useMediaQuery } from "@mui/material";
+import { Box, Divider, Typography, useMediaQuery } from "@mui/material";
 
 interface Props {
   name: string | undefined;
@@ -20,9 +20,15 @@ export const ProductDetailsHeader = ({
       display={isNonMobileScreens ? "flex" : "block"}
       justifyContent="space-between"
       alignItems="start"
+      bgcolor="rgb(25,118,210)"
     >
-      <Box m="25px">
+      <Box m="25px" color="white">
         <Typography variant="h4">{name}</Typography>
+        <Divider
+          variant="middle"
+          color="white"
+          sx={{ margin: "10px auto", height: "2px" }}
+        />
         <Typography variant="h6" textTransform="uppercase" sx={{ mt: "20px" }}>
           {secondName}
         </Typography>

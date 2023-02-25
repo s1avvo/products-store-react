@@ -5,12 +5,14 @@ import { SupplyDetails } from "../../components/ProductDetails/SupplyDetails";
 import { ProductDetailsHeader } from "../../components/ProductDetails/ProductDetailsHeader";
 
 import { GoodsEntity, ProductEntity } from "types";
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, useMediaQuery } from "@mui/material";
 import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
 import { TopBox } from "../../components/Global/TopBox";
 
 export const ProductDetails = () => {
   const { productId } = useParams();
+  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
+
   const [product, setProduct] = useState<ProductEntity | null>(null);
   const [goodsIssue, setGoodsIssue] = useState<GoodsEntity[]>([]);
   const [goodsReception, setGoodsReception] = useState<GoodsEntity[]>([]);
@@ -55,20 +57,30 @@ export const ProductDetails = () => {
           zIndex: "10",
         }}
       >
-        {/* HEADER */}
-        <ProductDetailsHeader
-          name={product?.name}
-          secondName={product?.secondName}
-          qty={`${product?.qty}${product?.unit}`}
-          place={product?.place}
-        />
-
-        {/* GOODSIssue AND GOODSReception */}
-        <SupplyDetails
-          goodsIssue={goodsIssue}
-          goodsReception={goodsReception}
-          isLoading={isLoading}
-        />
+        <Box
+          display="grid"
+          gap="30px"
+          gridTemplateColumns="1fr 2fr"
+          sx={{
+            "& > div": {
+              gridColumn: isNonMobileScreens ? undefined : "span 2",
+            },
+          }}
+        >
+          {/* HEADER */}
+          <ProductDetailsHeader
+            name={product?.name}
+            secondName={product?.secondName}
+            qty={`${product?.qty}${product?.unit}`}
+            place={product?.place}
+          />
+          {/* GOODSIssue AND GOODSReception */}
+          <SupplyDetails
+            goodsIssue={goodsIssue}
+            goodsReception={goodsReception}
+            isLoading={isLoading}
+          />
+        </Box>
       </Paper>
     </Box>
   );

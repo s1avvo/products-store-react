@@ -41,17 +41,15 @@ export const SupplyDetails = ({
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="product-details-tabs"
-        >
-          <Tab label="WYDANIA" value="goods" />
-          <Tab label="ZAMÓWIENIA" value="orders" />
-        </Tabs>
-      </Box>
+    <Box padding="10px">
+      <Tabs
+        value={value}
+        onChange={handleChange}
+        aria-label="product-details-tabs"
+      >
+        <Tab label="WYDANIA" value="goods" sx={{ fontSize: "1.25rem" }} />
+        <Tab label="ZAMÓWIENIA" value="orders" sx={{ fontSize: "1.25rem" }} />
+      </Tabs>
       <TabPanel index="goods" value={value}>
         <ProductDetailsDataGrid
           rows={goodsIssue}
