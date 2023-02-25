@@ -14,7 +14,7 @@ export const ProductDetailsHeader = ({
   qty,
   place,
 }: Props) => {
-  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
   return (
     <Box
       display={isNonMobileScreens ? "flex" : "block"}

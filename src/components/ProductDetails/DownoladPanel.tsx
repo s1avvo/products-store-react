@@ -7,7 +7,7 @@ interface Props {
 }
 
 export const DownloadFile = ({ id }: Props) => {
-  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
   const download = async () => {
     try {
       const res = await fetch(`${apiUrl}/download/${id}.pdf`, {

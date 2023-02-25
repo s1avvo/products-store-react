@@ -10,10 +10,10 @@ import {
   IconButton,
   MenuItem,
   Modal,
-  Paper,
   Switch,
   TextField,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { EditOutlined, DeleteOutlined } from "@mui/icons-material";
 import { useDropzone } from "react-dropzone";
@@ -71,6 +71,7 @@ const validationSchema = Yup.object().shape({
 export const AddOrEditProductForm = (props: Props) => {
   const [initialValues, setInitialValues] = useState(props.valueForm);
   const [file, setFile] = useState(defaultValueDataSheet);
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFile({ file: acceptedFiles[0], productDataSheet: 1 });
@@ -110,149 +111,149 @@ export const AddOrEditProductForm = (props: Props) => {
       onClose={props.onClose}
       aria-labelledby="product-form"
     >
-      <Paper
-        sx={{
-          position: "absolute",
-          right: "0px",
-          width: "max(420px, 30%)",
-          margin: "0 auto",
-          height: "100%",
-          backgroundColor: "white",
-          padding: "20px",
-          gap: "20px",
-        }}
+      <Box
+        position="absolute"
+        right="0px"
+        width={isNonMobileScreens ? "max(420px, 30%)" : "100%"}
+        margin="0 auto"
+        height="100%"
+        bgcolor="white"
       >
-        <Formik
-          enableReinitialize
-          onSubmit={handleProductForm}
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-        >
-          {({
-            values,
-            errors,
-            touched,
-            handleBlur,
-            handleChange,
-            handleSubmit,
-            setFieldValue,
-          }) => (
-            <form onSubmit={handleSubmit}>
-              <Box display="flex" flexDirection="column" gap="20px">
-                <TextField
-                  label="Nazwa"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.name}
-                  name="name"
-                  error={Boolean(touched.name) && Boolean(errors.name)}
-                  helperText={touched.name && errors.name}
-                />
-                <TextField
-                  label="Druga nazwa"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.secondName}
-                  name="secondName"
-                  error={
-                    Boolean(touched.secondName) && Boolean(errors.secondName)
-                  }
-                  helperText={touched.secondName && errors.secondName}
-                />
-                <TextField
-                  label="j.m."
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.unit}
-                  name="unit"
-                  error={Boolean(touched.unit) && Boolean(errors.unit)}
-                  helperText={touched.unit && errors.unit}
-                  select
-                >
-                  <MenuItem value={Units.l}>l</MenuItem>
-                  <MenuItem value={Units.kg}>kg</MenuItem>
-                </TextField>
-                <TextField
-                  label="Miejsce"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.place}
-                  name="place"
-                  error={Boolean(touched.place) && Boolean(errors.place)}
-                  helperText={touched.place && errors.place}
-                />
-                <FormControl variant="standard" component="fieldset">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        name="active"
-                        value={values.active}
-                        checked={values.active === 1}
-                        onChange={(event, checked) => {
-                          setFieldValue("active", checked ? 1 : 0);
-                        }}
-                      />
-                    }
-                    label="Wł./Wył. produkt"
+        <Box overflow="auto" height="100%" padding="30px" gap="20px">
+          <Formik
+            enableReinitialize
+            onSubmit={handleProductForm}
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleBlur,
+              handleChange,
+              handleSubmit,
+              setFieldValue,
+            }) => (
+              <form onSubmit={handleSubmit}>
+                <Box display="flex" flexDirection="column" gap="20px">
+                  <TextField
+                    label="Nazwa"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.name}
+                    name="name"
+                    error={Boolean(touched.name) && Boolean(errors.name)}
+                    helperText={touched.name && errors.name}
                   />
-                </FormControl>
+                  <TextField
+                    label="Druga nazwa"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.secondName}
+                    name="secondName"
+                    error={
+                      Boolean(touched.secondName) && Boolean(errors.secondName)
+                    }
+                    helperText={touched.secondName && errors.secondName}
+                  />
+                  <TextField
+                    label="j.m."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.unit}
+                    name="unit"
+                    error={Boolean(touched.unit) && Boolean(errors.unit)}
+                    helperText={touched.unit && errors.unit}
+                    select
+                  >
+                    <MenuItem value={Units.l}>l</MenuItem>
+                    <MenuItem value={Units.kg}>kg</MenuItem>
+                  </TextField>
+                  <TextField
+                    label="Miejsce"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.place}
+                    name="place"
+                    error={Boolean(touched.place) && Boolean(errors.place)}
+                    helperText={touched.place && errors.place}
+                  />
+                  <FormControl variant="standard" component="fieldset">
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          name="active"
+                          value={values.active}
+                          checked={values.active === 1}
+                          onChange={(event, checked) => {
+                            setFieldValue("active", checked ? 1 : 0);
+                          }}
+                        />
+                      }
+                      label="Wł./Wył. produkt"
+                    />
+                  </FormControl>
 
-                {/* FILE DROPZONE */}
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
+                  {/* FILE DROPZONE */}
                   <Box
-                    border={`1px dashed lightgrey`}
-                    borderRadius="5px"
-                    p="1rem"
-                    width="100%"
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
                   >
-                    {initialValues.productDataSheet !== 1 ? (
-                      <div {...getRootProps()}>
-                        <input {...getInputProps()} />
-                        {!file.file ? (
-                          isDragActive ? (
-                            <Typography>Możesz puścić plik</Typography>
+                    <Box
+                      border={`1px dashed lightgrey`}
+                      borderRadius="5px"
+                      p="1rem"
+                      width="100%"
+                    >
+                      {initialValues.productDataSheet !== 1 ? (
+                        <div {...getRootProps()}>
+                          <input {...getInputProps()} />
+                          {!file.file ? (
+                            isDragActive ? (
+                              <Typography>Możesz puścić plik</Typography>
+                            ) : (
+                              <Typography>
+                                Dodaj kartę charakterystyki
+                              </Typography>
+                            )
                           ) : (
-                            <Typography>Dodaj kartę charakterystyki</Typography>
-                          )
-                        ) : (
-                          <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                          >
-                            <Typography>{file.file?.name}</Typography>
-                            <EditOutlined />
-                          </Box>
-                        )}
-                      </div>
-                    ) : (
-                      <Typography>Karta została już dodana</Typography>
-                    )}
+                            <Box
+                              display="flex"
+                              justifyContent="space-between"
+                              alignItems="center"
+                            >
+                              <Typography>{file.file?.name}</Typography>
+                              <EditOutlined />
+                            </Box>
+                          )}
+                        </div>
+                      ) : (
+                        <Typography>Karta została już dodana</Typography>
+                      )}
+                    </Box>
+                    <IconButton
+                      color="primary"
+                      onClick={() => setFile(defaultValueDataSheet)}
+                    >
+                      <DeleteOutlined />
+                    </IconButton>
                   </Box>
-                  <IconButton
-                    color="primary"
-                    onClick={() => setFile(defaultValueDataSheet)}
-                  >
-                    <DeleteOutlined />
-                  </IconButton>
-                </Box>
 
-                {/* BUTTONS */}
-                <Box display="flex" justifyContent="space-between" gap="10px">
-                  <Button variant="contained" type="submit" fullWidth>
-                    Wyślij
-                  </Button>
-                  <Button onClick={props.onClose}>Cancel</Button>
+                  {/* BUTTONS */}
+                  <Box display="flex" justifyContent="space-between" gap="10px">
+                    <Button variant="contained" type="submit" fullWidth>
+                      Wyślij
+                    </Button>
+                    <Button onClick={props.onClose}>Anuluj</Button>
+                  </Box>
                 </Box>
-              </Box>
-            </form>
-          )}
-        </Formik>
-      </Paper>
+              </form>
+            )}
+          </Formik>
+        </Box>
+      </Box>
     </Modal>
   );
 };

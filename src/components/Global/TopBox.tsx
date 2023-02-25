@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery } from "@mui/material";
 
 interface Props {
   name: string;
@@ -7,6 +7,7 @@ interface Props {
 }
 
 export const TopBox = (props: Props) => {
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
   return (
     <Box
       display="flex"
@@ -19,8 +20,18 @@ export const TopBox = (props: Props) => {
           {props.name}
         </Typography>
       </Box>
-      <Box minWidth="120px">
-        <Box>{props.children}</Box>
+      <Box
+        minWidth="120px"
+        display={isNonMobileScreens ? "flex" : "block"}
+        textAlign="end"
+      >
+        <Box
+          display="flex"
+          gap="5px"
+          flexDirection={isNonMobileScreens ? "row" : "column"}
+        >
+          {props.children}
+        </Box>
       </Box>
     </Box>
   );

@@ -18,7 +18,7 @@ interface Props {
 
 export const ProductsDataGrid = ({ rows, columns, postStatus }: Props) => {
   const navigate = useNavigate();
-  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
   const [pageSize, setPageSize] = useState(10);
 
   return (

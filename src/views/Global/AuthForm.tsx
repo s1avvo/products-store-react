@@ -77,7 +77,7 @@ export const AuthForm = () => {
               margin: "0 auto",
               padding: "20px",
               flexDirection: "column",
-              maxWidth: "400px",
+              width: "max(350px, 25%)",
               gap: "20px",
             }}
           >

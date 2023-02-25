@@ -21,7 +21,6 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
         <Button
           variant="contained"
           endIcon={<MenuIcon />}
-          sx={{ fontWeight: "bold", marginRight: "10px" }}
           onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
             setAnchorEl(event.currentTarget);
           }}

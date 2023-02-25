@@ -12,6 +12,7 @@ import {
   Select,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 
 import {
@@ -27,6 +28,7 @@ import { setLogout } from "../../state/authSlice";
 export const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
   const cart = useAppSelector((state) => state.cart.cart);
   const user = useAppSelector((state) => state.auth.user);
   const isAuth = Boolean(useAppSelector((state) => state.auth.token));
@@ -60,10 +62,12 @@ export const Navbar = () => {
             }}
             sx={{ "&:hover": { cursor: "pointer" } }}
           >
-            <IconButton sx={{ color: "black" }}>
-              <HomeOutlined />
-            </IconButton>
-            <Typography>STRONA GŁÓWNA</Typography>
+            <Tooltip title="Strona główna">
+              <IconButton sx={{ color: "black" }}>
+                <HomeOutlined />
+              </IconButton>
+            </Tooltip>
+            {isNonMobileScreens && <Typography>STRONA GŁÓWNA</Typography>}
           </Box>
           <Box display="flex" gap="10px">
             <Badge

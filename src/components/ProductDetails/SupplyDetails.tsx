@@ -17,7 +17,7 @@ export const SupplyDetails = ({
   goodsReception,
   isLoading,
 }: Props) => {
-  const isNonMobileScreens = useMediaQuery("(min-width:800px)");
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
   const [value, setValue] = useState("goods");
 
   const columns: GridColDef[] = [

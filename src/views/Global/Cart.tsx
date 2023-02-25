@@ -14,6 +14,7 @@ import {
   SelectChangeEvent,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import styled from "@emotion/styled";
@@ -35,6 +36,7 @@ const FlexBox = styled(Box)`
 
 export const Cart = () => {
   const dispatch = useAppDispatch();
+  const isNonMobileScreens = useMediaQuery("(min-width:600px)");
   const token = useAppSelector((state) => state.auth.token);
   const cart = useAppSelector((state) => state.cart.cart);
   const cartType = useAppSelector((state) => state.cart.goodsIssueOrReception);
@@ -127,7 +129,7 @@ export const Cart = () => {
         position="absolute"
         right="0px"
         margin="0 auto"
-        width="max(420px, 30%)"
+        width={isNonMobileScreens ? "max(420px, 30%)" : "100%"}
         height="100%"
         bgcolor="white"
         component="form"
