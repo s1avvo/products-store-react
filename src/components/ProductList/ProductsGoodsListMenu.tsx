@@ -20,7 +20,7 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
     <>
       <FormControl sx={{ width: "230px" }} size="small">
         <InputLabel id="filter" variant="filled">
-          STATYSTYKI
+          WYŚWIETL
         </InputLabel>
         <Select
           id="filter"
