@@ -62,9 +62,6 @@ export const ProductsDataGrid = ({ rows, columns, postStatus }: Props) => {
               secondName: isNonMobileScreens,
             },
           },
-          sorting: {
-            sortModel: [{ field: "name", sort: "asc" }],
-          },
         }}
       />
     </Paper>
