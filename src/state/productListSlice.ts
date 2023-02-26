@@ -139,17 +139,15 @@ export const productListSlice = createSlice({
       })
       .addCase(addProductToList.fulfilled, (state, action) => {
         state.productsList.push(action.payload);
-        state.status = "idle";
       })
       .addCase(updateProductOnList.fulfilled, (state, action) => {
-        state.productsList.map((item) =>
-          item.id === action.meta.arg.product.id ? { ...action.meta.arg } : item
-        );
+        state.productsList[action.payload.id] = action.payload;
         state.status = "idle";
       })
       .addCase(deleteProductFromList.fulfilled, (state, action) => {
-        state.productsList.filter((item) => item.id !== action.meta.arg.id);
-        state.status = "idle";
+        state.productsList = state.productsList.filter(
+          (item) => item.id !== action.meta.arg.id
+        );
       })
       .addCase(updateProductDataSheet.fulfilled, (state, action) => {
         state.productsList.map((item) =>
