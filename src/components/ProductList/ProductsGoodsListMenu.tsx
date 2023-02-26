@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-
 import { useAppDispatch } from "../../app/redux-hooks";
-
-import { Button, Menu, MenuItem, Tooltip } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
-
 import { setStatus } from "../../state/productListSlice";
+
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
 interface Props {
   handleFilter: (filter: string) => void;
@@ -13,69 +10,66 @@ interface Props {
 
 export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
   const dispatch = useAppDispatch();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [value, setValue] = useState("products");
   return (
     <>
-      <Tooltip title="Statystyki produktów">
-        <Button
-          variant="contained"
-          endIcon={<MenuIcon />}
-          onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
-            setAnchorEl(event.currentTarget);
-          }}
-          aria-controls={open ? "stats" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
+      <FormControl sx={{ width: "230px" }} size="small">
+        <InputLabel id="filter" variant="filled">
+          STATYSTYKI
+        </InputLabel>
+        <Select
+          id="filter"
+          variant="filled"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
         >
-          top 25
-        </Button>
-      </Tooltip>
-      <Menu
-        id="stats"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={() => setAnchorEl(null)}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-      >
-        <MenuItem
-          onClick={() => {
-            handleFilter("products-goods-issue-frequently");
-            dispatch(setStatus("idle"));
-            setAnchorEl(null);
-          }}
-        >
-          Najcześciej wydawane
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleFilter("products-goods-reception-frequently");
-            dispatch(setStatus("idle"));
-            setAnchorEl(null);
-          }}
-        >
-          Najcześciej przyjmowane
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleFilter("products-goods-issue-recently");
-            dispatch(setStatus("idle"));
-            setAnchorEl(null);
-          }}
-        >
-          Ostatnio wydane
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            handleFilter("products-goods-reception-recently");
-            dispatch(setStatus("idle"));
-            setAnchorEl(null);
-          }}
-        >
-          Ostatnio przyjęte
-        </MenuItem>
-      </Menu>
+          <MenuItem
+            value="products"
+            onClick={() => {
+              handleFilter("products");
+              dispatch(setStatus("idle"));
+            }}
+          >
+            Wszystkie
+          </MenuItem>
+          <MenuItem
+            value="products-goods-issue-frequently"
+            onClick={() => {
+              handleFilter("products-goods-issue-frequently");
+              dispatch(setStatus("idle"));
+            }}
+          >
+            Najczęściej wydawane
+          </MenuItem>
+          <MenuItem
+            value="products-goods-reception-frequently"
+            onClick={() => {
+              handleFilter("products-goods-reception-frequently");
+              dispatch(setStatus("idle"));
+            }}
+          >
+            Najczęściej przyjmowane
+          </MenuItem>
+          <MenuItem
+            value="products-goods-issue-recently"
+            onClick={() => {
+              handleFilter("products-goods-issue-recently");
+              dispatch(setStatus("idle"));
+            }}
+          >
+            Ostatnio wydane
+          </MenuItem>
+          <MenuItem
+            value="products-goods-reception-recently"
+            onClick={() => {
+              handleFilter("products-goods-reception-recently");
+              dispatch(setStatus("idle"));
+            }}
+          >
+            Ostatnio przyjęte
+          </MenuItem>
+        </Select>
+      </FormControl>
     </>
   );
 };
