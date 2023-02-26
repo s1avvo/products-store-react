@@ -32,6 +32,10 @@ import {
 } from "../../components/ProductList/AddOrEditProductForm";
 import { TopBox } from "../../components/Global/TopBox";
 import { ProductsDataGrid } from "../../components/ProductList/ProductsDataGrid";
+import {
+  MySnackbar,
+  SnackbarInterface,
+} from "../../components/Global/MySnackbar";
 
 export const ProductsListAdmin = () => {
   const dispatch = useAppDispatch();
@@ -48,22 +52,11 @@ export const ProductsListAdmin = () => {
     null
   );
   const [openAddForm, setOpenAddForm] = useState(false);
-
-  if (!token) throw new Error("Brak autoryzacji");
-
-  /*FILTER*/
-
-  const handleFilter = (filter: string) => {
-    setFilter(filter);
-  };
-
-  /*GET ACTION*/
-
-  const getProductsList = async () => {
-    await dispatch(fetchProductsList(filter!))
-      .unwrap()
-      .catch((err) => console.log(err.message));
-  };
+  const [openSnackbar, setOpenSnackbar] = useState<SnackbarInterface>({
+    open: false,
+    alert: "",
+    variant: "info",
+  });
 
   const handleEditFormValue = (product: ProductEntity) => {
     const { id, name, secondName, unit, place, productDataSheet, active } =
@@ -86,44 +79,104 @@ export const ProductsListAdmin = () => {
     product: CreateProduct,
     dataSheet: File | null
   ) => {
-    const newProduct = await dispatch(addProductToList({ product, token }))
-      .unwrap()
-      .catch((err) => console.log(err.message));
+    if (token) {
+      const newProduct = await dispatch(addProductToList({ product, token }))
+        .unwrap()
+        .catch((err) =>
+          setOpenSnackbar({
+            open: true,
+            alert: `[${err.message}] Nie udało dodać się produktu, spróbuj ponownie.`,
+            variant: "error",
+          })
+        );
 
-    setOpenAddForm(false);
+      setOpenSnackbar({
+        open: true,
+        alert: `Dodano produkt.`,
+        variant: "success",
+      });
 
-    if (!dataSheet) return;
-    const uploadedFile = new FormData();
-    uploadedFile.append("uploaded", dataSheet, `${newProduct.id}.pdf`);
+      setOpenAddForm(false);
 
-    await dispatch(
-      updateProductDataSheet({ id: newProduct.id, token, file: uploadedFile })
-    )
-      .unwrap()
-      .catch((err) => console.log(err.message));
+      if (!dataSheet) return;
+      const uploadedFile = new FormData();
+      uploadedFile.append("uploaded", dataSheet, `${newProduct.id}.pdf`);
+
+      await dispatch(
+        updateProductDataSheet({ id: newProduct.id, token, file: uploadedFile })
+      )
+        .unwrap()
+        .catch((err) =>
+          setOpenSnackbar({
+            open: true,
+            alert: `[${err.message}] Nie udało dodać się karty charakterystyki, spróbuj ponownie.`,
+            variant: "error",
+          })
+        );
+    }
   };
 
-  // /*PUT ACTION*/
+  /*PUT ACTION*/
 
   const handleUpdateProduct = async (
     product: CreateProduct,
     dataSheet: File | null
   ) => {
-    const newProduct = await dispatch(updateProductOnList({ product, token }))
-      .unwrap()
-      .catch((err) => console.log(err.message));
+    if (token) {
+      const newProduct = await dispatch(updateProductOnList({ product, token }))
+        .unwrap()
+        .catch((err) =>
+          setOpenSnackbar({
+            open: true,
+            alert: `[${err.message}] Nie udało zmienić się produktu, spróbuj ponownie.`,
+            variant: "error",
+          })
+        );
 
-    setOpenEditForm(false);
+      setOpenSnackbar({
+        open: true,
+        alert: `Zmieniono produkt.`,
+        variant: "success",
+      });
 
-    if (!dataSheet) return;
-    const uploadedFile = new FormData();
-    uploadedFile.append("uploaded", dataSheet, `${newProduct.id}.pdf`);
+      setOpenEditForm(false);
 
-    await dispatch(
-      updateProductDataSheet({ id: newProduct.id, token, file: uploadedFile })
-    )
-      .unwrap()
-      .catch((err) => console.log(err.message));
+      if (!dataSheet) return;
+      const uploadedFile = new FormData();
+      uploadedFile.append("uploaded", dataSheet, `${newProduct.id}.pdf`);
+
+      await dispatch(
+        updateProductDataSheet({ id: newProduct.id, token, file: uploadedFile })
+      )
+        .unwrap()
+        .catch((err) =>
+          setOpenSnackbar({
+            open: true,
+            alert: `[${err.message}] Nie udało dodać się karty charakterystyki, spróbuj ponownie.`,
+            variant: "error",
+          })
+        );
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if (token) {
+      dispatch(deleteProductFromList({ id, token }))
+        .unwrap()
+        .catch((err) =>
+          setOpenSnackbar({
+            open: true,
+            alert: `[${err.message}] Nie udało usunąć się produktu, spróbuj ponownie.`,
+            variant: "error",
+          })
+        );
+
+      setOpenSnackbar({
+        open: true,
+        alert: `Usunięto produkt.`,
+        variant: "success",
+      });
+    }
   };
 
   /*SET CART ITEM*/
@@ -133,11 +186,30 @@ export const ProductsListAdmin = () => {
     setOpenAmountForm(false);
   };
 
+  /*GET ACTION*/
+
   useEffect(() => {
-    if (postStatus === "idle") {
-      getProductsList();
+    if (!token) {
+      setOpenSnackbar({
+        open: true,
+        alert: "Błąd autoryzacji, zaloguj się ponownie",
+        variant: "warning",
+      });
     }
-  }, [postStatus]);
+    if (postStatus === "idle") {
+      (async () => {
+        await dispatch(fetchProductsList(filter!))
+          .unwrap()
+          .catch((err) =>
+            setOpenSnackbar({
+              open: true,
+              alert: `[${err.message}] Nie udało załadować się danych, spróbuj później.`,
+              variant: "error",
+            })
+          );
+      })();
+    }
+  }, [postStatus, token, filter, dispatch]);
 
   const columns: GridColDef[] = [
     {
@@ -197,11 +269,7 @@ export const ProductsListAdmin = () => {
             key={`${cellValues.id}-delete`}
             icon={<DeleteOutlined />}
             label="Delete"
-            onClick={() =>
-              dispatch(
-                deleteProductFromList({ id: cellValues.id as string, token })
-              )
-            }
+            onClick={() => handleDeleteProduct(cellValues.id as string)}
             color="inherit"
           />,
         ];
@@ -232,7 +300,7 @@ export const ProductsListAdmin = () => {
       />
       <Box width="90%" margin="20px auto">
         <TopBox name="Lista">
-          <ProductsGoodsListMenu handleFilter={handleFilter} />
+          <ProductsGoodsListMenu handleFilter={(filter) => setFilter(filter)} />
           <Button variant="contained" onClick={() => setOpenAddForm(true)}>
             Dodaj produkt
           </Button>
@@ -243,6 +311,16 @@ export const ProductsListAdmin = () => {
           postStatus={postStatus}
         />
       </Box>
+      {openSnackbar && (
+        <MySnackbar
+          open={openSnackbar.open}
+          onClose={() =>
+            setOpenSnackbar((prevState) => ({ ...prevState, open: false }))
+          }
+          alert={openSnackbar.alert}
+          variant={openSnackbar.variant}
+        />
+      )}
     </>
   );
 };
