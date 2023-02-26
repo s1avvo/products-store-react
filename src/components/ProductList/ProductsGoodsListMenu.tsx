@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "../../app/redux-hooks";
 import { setStatus } from "../../state/productListSlice";
 
@@ -11,6 +11,11 @@ interface Props {
 export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState("products");
+
+  useEffect(() => {
+    dispatch(setStatus("idle"));
+  }, [value, dispatch]);
+
   return (
     <>
       <FormControl sx={{ width: "230px" }} size="small">
@@ -27,43 +32,42 @@ export const ProductsGoodsListMenu = ({ handleFilter }: Props) => {
             value="products"
             onClick={() => {
               handleFilter("products");
-              dispatch(setStatus("idle"));
             }}
           >
             Wszystkie
           </MenuItem>
           <MenuItem
+            key="products-goods-issue-frequently"
             value="products-goods-issue-frequently"
             onClick={() => {
               handleFilter("products-goods-issue-frequently");
-              dispatch(setStatus("idle"));
             }}
           >
             Najczęściej wydawane
           </MenuItem>
           <MenuItem
+            key="products-goods-reception-frequently"
             value="products-goods-reception-frequently"
             onClick={() => {
               handleFilter("products-goods-reception-frequently");
-              dispatch(setStatus("idle"));
             }}
           >
             Najczęściej przyjmowane
           </MenuItem>
           <MenuItem
+            key="products-goods-issue-recently"
             value="products-goods-issue-recently"
             onClick={() => {
               handleFilter("products-goods-issue-recently");
-              dispatch(setStatus("idle"));
             }}
           >
             Ostatnio wydane
           </MenuItem>
           <MenuItem
+            key="products-goods-reception-recently"
             value="products-goods-reception-recently"
             onClick={() => {
               handleFilter("products-goods-reception-recently");
-              dispatch(setStatus("idle"));
             }}
           >
             Ostatnio przyjęte

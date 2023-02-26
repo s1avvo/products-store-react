@@ -52,7 +52,7 @@ interface Props {
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
-    .required("Podaj nazwe produktu")
+    .required("Podaj nazwę produktu")
     .min(3, "Nazwa musi zawierać min. 3 znaki"),
   secondName: Yup.string()
     .notRequired()
@@ -65,7 +65,7 @@ const validationSchema = Yup.object().shape({
     .required(),
   place: Yup.number()
     .typeError("Pole może zawierać tylko liczby")
-    .required("Podaj miejsce productu"),
+    .required("Podaj miejsce produktu"),
 });
 
 export const AddOrEditProductForm = (props: Props) => {

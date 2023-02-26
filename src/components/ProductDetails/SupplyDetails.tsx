@@ -48,7 +48,7 @@ export const SupplyDetails = ({
         aria-label="product-details-tabs"
       >
         <Tab label="WYDANIA" value="goods" sx={{ fontSize: "1.25rem" }} />
-        <Tab label="ZAMÓWIENIA" value="orders" sx={{ fontSize: "1.25rem" }} />
+        <Tab label="PRZYJĘCIA" value="orders" sx={{ fontSize: "1.25rem" }} />
       </Tabs>
       <TabPanel index="goods" value={value}>
         <ProductDetailsDataGrid

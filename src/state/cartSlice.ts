@@ -10,6 +10,7 @@ export enum PERSONS {
   jzwawik = "Justyna Żwawiak",
   mbednard = "Marek Bernard",
   jwargula = "Joanna Warguła",
+  utylizacja = "Utylizacja",
 }
 
 export interface Cart {

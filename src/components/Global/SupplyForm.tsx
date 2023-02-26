@@ -31,7 +31,7 @@ const initialValues: Cart = {
 const validationSchema = Yup.object().shape({
   amount: Yup.number()
     .typeError("Pole może zawierać tylko liczby")
-    .moreThan(0, "Podaj wartość wiekszą niż 0")
+    .moreThan(0, "Podaj wartość większą niż 0")
     .required("Podaj ilość"),
   person: Yup.mixed<PERSONS>()
     .oneOf(Object.values(PERSONS), "Wybierz osobę")
