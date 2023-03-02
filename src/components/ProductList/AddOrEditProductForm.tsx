@@ -18,6 +18,7 @@ import {
 import { EditOutlined, DeleteOutlined } from "@mui/icons-material";
 import { useDropzone } from "react-dropzone";
 import { Formik, FormikHelpers } from "formik";
+import moment from "moment/moment";
 
 enum Units {
   l = "l",
@@ -85,6 +86,7 @@ export const AddOrEditProductForm = (props: Props) => {
       ? props.addOrEditProduct(
           {
             ...values,
+            createdAt: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
             productDataSheet: file.productDataSheet,
           } as CreateProduct,
           file.file
@@ -92,6 +94,7 @@ export const AddOrEditProductForm = (props: Props) => {
       : props.addOrEditProduct(
           {
             ...values,
+            createdAt: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
             productDataSheet: file.productDataSheet,
             id: initialValues.id,
           } as CreateProduct,

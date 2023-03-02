@@ -1,4 +1,5 @@
 import React, { FormEvent, useEffect, useState } from "react";
+import moment from "moment";
 import { useAppDispatch, useAppSelector } from "../../app/redux-hooks";
 import { apiUrl } from "../../config/api";
 import {
@@ -75,6 +76,7 @@ export const Cart = () => {
           body: JSON.stringify({
             amount: item.amount,
             person: item.person,
+            date: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
             productId: item.productId,
           }),
         });
@@ -112,6 +114,7 @@ export const Cart = () => {
           body: JSON.stringify({
             amount: item.amount,
             person: item.person,
+            date: moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
             productId: item.productId,
           }),
         });

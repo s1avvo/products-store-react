@@ -5,6 +5,7 @@ import { ProductDetailsDataGrid } from "./ProductDetailsDataGrid";
 
 import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
+import moment from "moment";
 
 interface Props {
   goodsIssue: GoodsEntity[];
@@ -29,8 +30,8 @@ export const SupplyDetails = ({
       type: "date",
       valueGetter: ({ value }) =>
         isNonMobileScreens
-          ? value && value.slice(0, -5).replace("T", " ")
-          : value && value.slice(0, -14),
+          ? value && moment(value).format("YYYY-MM-DD HH:mm:ss")
+          : value && moment(value).format("YYYY-MM-DD"),
     },
     { field: "amount", headerName: "Ilość", flex: 0.75, type: "number" },
     { field: "person", headerName: "Osoba", flex: 1.5 },
