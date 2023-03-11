@@ -123,6 +123,7 @@ export const ProductsListAdmin = () => {
     dataSheet: File | null
   ) => {
     if (token) {
+      console.log(product);
       const newProduct = await dispatch(updateProductOnList({ product, token }))
         .unwrap()
         .catch((err) =>

@@ -56,6 +56,7 @@
     ]
   },
   "devDependencies": {
+    "@types/customize-cra": "^1.0.4",
     "customize-cra": "^1.0.0",
     "prettier": "^2.8.1",
     "react-app-rewire-alias": "^1.1.7",
