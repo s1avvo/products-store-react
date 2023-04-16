@@ -17,7 +17,7 @@ import {
   SnackbarInterface,
 } from "../../components/Global/MySnackbar";
 
-export const ProductsListUsers = () => {
+const ProductsListUsers = () => {
   const dispatch = useAppDispatch();
 
   const products = useAppSelector(selectAllProducts);
@@ -99,3 +99,5 @@ export const ProductsListUsers = () => {
     </>
   );
 };
+
+export default ProductsListUsers;

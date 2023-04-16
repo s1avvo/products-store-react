@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 
-export const NotFoundView = () => (
+const NotFoundView = () => (
   <>
     <Box display="block" textAlign="center">
       <Typography
@@ -18,3 +18,5 @@ export const NotFoundView = () => (
     </Box>
   </>
 );
+
+export default NotFoundView;

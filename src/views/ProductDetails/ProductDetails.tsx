@@ -9,7 +9,7 @@ import { Box, Paper, useMediaQuery } from "@mui/material";
 import { DownloadFile } from "../../components/ProductDetails/DownoladPanel";
 import { TopBox } from "../../components/Global/TopBox";
 
-export const ProductDetails = () => {
+const ProductDetails = () => {
   const { productId } = useParams();
   const isNonMobileScreens = useMediaQuery("(min-width:800px)");
 
@@ -85,3 +85,5 @@ export const ProductDetails = () => {
     </Box>
   );
 };
+
+export default ProductDetails;

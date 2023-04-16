@@ -37,7 +37,7 @@ import {
   SnackbarInterface,
 } from "../../components/Global/MySnackbar";
 
-export const ProductsListAdmin = () => {
+const ProductsListAdmin = () => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector((state) => state.auth.token);
@@ -325,3 +325,5 @@ export const ProductsListAdmin = () => {
     </>
   );
 };
+
+export default ProductsListAdmin;
