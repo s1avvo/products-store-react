@@ -2,6 +2,8 @@
 
 A simple application to manage products in stock.
 
+https://chemarch.networkmanager.pl
+
 
 ## Screenshots
 
@@ -13,6 +15,17 @@ Details view
 
 [![details.png](https://i.postimg.cc/2SMj8JD9/details.png)](https://postimg.cc/qNcH11g2)
 
+Admin mode - create new product
+
+[![create-product.png](https://i.postimg.cc/SsJZ85nQ/create-product.png)](https://postimg.cc/hzRbR28N)
+
+Admin mode - add/remove quantity on store view
+
+[![add-to-cart.png](https://i.postimg.cc/FHY1MVkd/add-to-cart.png)](https://postimg.cc/QFrX55bh)
+
+Admin mode - cart view
+
+[![cart.png](https://i.postimg.cc/G2mkssSk/cart.png)](https://postimg.cc/WDxDBtV3)
 
 ## Features
 
